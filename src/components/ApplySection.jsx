@@ -6,6 +6,7 @@ export default function ApplySection() {
   const [appEmail, setAppEmail] = useState("");
   const [appGitHub, setAppGitHub] = useState("");
   const [appSubmitted, setAppSubmitted] = useState(false);
+  const [appDiscord, setAppDiscord] = useState("");
 
   const handleApplicationSubmit = (e) => {
     e.preventDefault();
@@ -60,7 +61,20 @@ export default function ApplySection() {
                 onChange={(e) => setAppGitHub(e.target.value)}
               />
             </div>
-            <button type="submit" className="btn btn-primary w-full"><Rocket size={16} style={{ marginRight: '6px' }} /> Submit Application</button>
+             <div className="form-group text-left">
+              <label className="form-label mono-font" htmlFor="app-discord">Discord UserId</label>
+              <input 
+                type="number" 
+                id="app-discord" 
+                className="form-input" 
+                placeholder="e.g., 1234567890" 
+                required 
+                value={appDiscord}
+                onChange={(e) => setAppDiscord(e.target.value)}
+              />
+            </div>
+            
+            <button type="submit" className="btn btn-primary w-full" style={{ marginTop: "20px" }}><Rocket size={16} style={{ marginRight: '6px' }} /> Submit Application</button>
           </form>
         ) : (
           <div className="form-success-msg" id="application-success">

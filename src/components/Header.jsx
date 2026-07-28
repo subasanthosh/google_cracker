@@ -15,8 +15,8 @@ export default function Header({ currentPage, setCurrentPage, xp, consoleGlitch,
           </div>
           <nav className="nav-links">
             <a href="#" className="nav-link" onClick={(e) => { e.preventDefault(); setCurrentPage('how-it-works'); }}>How It Works</a>
-            <a href="#" className="nav-link" onClick={(e) => { e.preventDefault(); setCurrentPage('sprint'); }}>Coding Sprint</a>
-            <a href="#" className="nav-link" onClick={(e) => { e.preventDefault(); setCurrentPage('build-sprint'); }}>Build Sprint</a>
+            <a href="#" className="nav-link" onClick={(e) => { e.preventDefault(); setCurrentPage('weekly-system'); }}>Weekly System</a>
+            <a href="#" className="nav-link" onClick={(e) => { e.preventDefault(); setCurrentPage('sprint'); }}>Daily / Weekly Coding Sprint</a>
             <a href="#" className="nav-link" onClick={(e) => { e.preventDefault(); setCurrentPage('buddy-system'); }}>Buddy System</a>
             <a href="#" className="nav-link" onClick={(e) => { e.preventDefault(); setCurrentPage('xp-system'); }}>XP Dashboard</a>
             <a href="#" className="nav-link" onClick={(e) => { e.preventDefault(); setCurrentPage('daily-cycle'); }}>Daily Cycle</a>
@@ -35,7 +35,7 @@ export default function Header({ currentPage, setCurrentPage, xp, consoleGlitch,
             >
               {consoleGlitch ? <Monitor size={18} /> : <Terminal size={18} />}
             </button>
-            <a href="#" className="btn btn-primary btn-sm" onClick={(e) => { e.preventDefault(); setCurrentPage('apply-now'); }}>Apply Now</a>
+            <a href="#" className="btn btn-primary btn-lg" onClick={(e) => { e.preventDefault(); setCurrentPage('apply-now'); }}>Apply Now</a>
           </div>
           <button 
             className="mobile-menu-toggle" 
