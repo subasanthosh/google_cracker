@@ -12,6 +12,8 @@ import XpSystemSection from './components/XpSystemSection';
 import DailyCycleSection from './components/DailyCycleSection';
 import ApplySection from './components/ApplySection';
 import FaqSection from './components/FaqSection';
+import Login from './components/Login';
+import Register from './components/Register';
 
 import { initialLeaderboard } from './constants';
 
@@ -230,6 +232,10 @@ export default function App() {
         return <ApplySection />;
       case 'faq':
         return <FaqSection />;
+      case 'login':
+        return <Login setCurrentPage={setCurrentPage} earnXP={earnXP} />;
+      case 'register':
+        return <Register setCurrentPage={setCurrentPage} earnXP={earnXP} />;
       default:
         return <HeroSection 
           streak={streak} xp={xp} level={level} levelTitle={levelTitle}

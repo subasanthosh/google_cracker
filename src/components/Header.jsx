@@ -35,6 +35,14 @@ export default function Header({ currentPage, setCurrentPage, xp, consoleGlitch,
             >
               {consoleGlitch ? <Monitor size={18} /> : <Terminal size={18} />}
             </button>
+            <a 
+              href="#" 
+              className="nav-link mono-font" 
+              onClick={(e) => { e.preventDefault(); setCurrentPage('login'); }}
+              style={{ fontSize: '0.9rem', color: 'var(--color-electric-blue)', textDecoration: 'none', marginRight: '0.5rem' }}
+            >
+              [ SIGN_IN ]
+            </a>
             <a href="#" className="btn btn-primary btn-lg" onClick={(e) => { e.preventDefault(); setCurrentPage('apply-now'); }}>Apply Now</a>
           </div>
           <button 
@@ -54,8 +62,9 @@ export default function Header({ currentPage, setCurrentPage, xp, consoleGlitch,
         <a href="#" className="mobile-nav-link" onClick={(e) => { e.preventDefault(); setMobileMenuOpen(false); setCurrentPage('buddy-system'); }}>Buddy System</a>
         <a href="#" className="mobile-nav-link" onClick={(e) => { e.preventDefault(); setMobileMenuOpen(false); setCurrentPage('xp-system'); }}>XP Dashboard</a>
         <a href="#" className="mobile-nav-link" onClick={(e) => { e.preventDefault(); setMobileMenuOpen(false); setCurrentPage('daily-cycle'); }}>Daily Cycle</a>
-        <div className="mobile-nav-footer">
+        <div className="mobile-nav-footer" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           <a href="#" className="btn btn-primary w-full text-center" onClick={(e) => { e.preventDefault(); setMobileMenuOpen(false); setCurrentPage('apply-now'); }}>Apply Now</a>
+          <a href="#" className="btn btn-secondary w-full text-center font-mono" onClick={(e) => { e.preventDefault(); setMobileMenuOpen(false); setCurrentPage('login'); }}>Candidate Login</a>
         </div>
       </div>
     </>
