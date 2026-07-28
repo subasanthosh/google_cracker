@@ -1,9 +1,11 @@
+from fastapi import datastructures
 from h11._abnf import status_code
 from typing import Dict
 from fastapi import FastAPI,Body
 from fastapi import FastAPI,HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
+# pyrefly: ignore [missing-import]
 from argon2.exceptions import VerifyMismatchError
 from dotenv import load_dotenv  
 import os
@@ -48,7 +50,8 @@ async def register(data: dict):
             "name":data["name"],
             "email":data["email"],
         "github":data["github"],
-        "password":hashed
+        "password":hashed,
+        "role" : "student"
     })
 
     return {"message": "User registered successfully"}
@@ -78,5 +81,17 @@ async def login(data: dict):
             )
 
 
+@app.get("/getrole")
+async def get_role(email : str):
+    user = await userdb.find_one({"email" : email})
+    if user:
+        return {"role":user["role"]}
+    else:
+        raise HTTPException(
+            status_code=404,
+            detail="User Not Found"
+        )   
 
+
+    
 
