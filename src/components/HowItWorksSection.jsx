@@ -4,7 +4,7 @@ import googleBrightLobby from '../assets/google_bright_lobby.png';
 import googleBrightExterior from '../assets/google_bright_exterior.png';
 import googleBrightInterior from '../assets/google_bright_interior.png';
 
-export default function HowItWorksSection({ setCurrentPage }) {
+export default function HowItWorksSection() {
   return (
     <section className="how-it-works-section" id="how-it-works" style={{ padding: 0 }}>
       {/* Hero Section */}

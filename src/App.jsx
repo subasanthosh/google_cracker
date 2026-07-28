@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import './index.css';
 
 import Header from './components/Header';
@@ -12,6 +13,7 @@ import XpSystemSection from './components/XpSystemSection';
 import DailyCycleSection from './components/DailyCycleSection';
 import ApplySection from './components/ApplySection';
 import FaqSection from './components/FaqSection';
+import WeeklySystemSection from './components/WeeklySystemSection';
 
 import { initialLeaderboard } from './constants';
 
@@ -24,20 +26,23 @@ export default function App() {
   const [scheduledSessions, setScheduledSessions] = useState([]);
   const [leaderboardData, setLeaderboardData] = useState(initialLeaderboard);
   const [consoleGlitch, setConsoleGlitch] = useState(false);
-  const [currentPage, setCurrentPage] = useState("home");
-  
+
   const [feedItems, setFeedItems] = useState([
     { time: "12:28", user: "@alex_dev", action: "solved LeetCode #239 (Hard)", gain: "+200 XP" },
     { time: "12:25", user: "@pixel_ninja", action: "pushed 5 commits to velocity-core", gain: "+50 XP" }
   ]);
   const [floatingPopups, setFloatingPopups] = useState([]);
-  
+
   const [terminalInValue, setTerminalInValue] = useState("");
   const [terminalOutLines, setTerminalOutLines] = useState([
     { type: "sys", text: "Initializing cohort kernel terminal..." },
     { type: "sys", text: "Ready. Type 'help' for available diagnostic commands." }
   ]);
   const terminalInputRef = useRef(null);
+
+  const location = useLocation();
+  const isHome = location.pathname === '/';
+  const isApply = location.pathname === '/apply-now';
 
   useEffect(() => {
     const saved = localStorage.getItem("velocity_cohort_state");
@@ -148,7 +153,7 @@ export default function App() {
 
   const earnXP = (amount, reason = "Task Cleared") => {
     setXp(prev => prev + amount);
-    
+
     const id = Date.now() + Math.random();
     setFloatingPopups(prev => [...prev, { id, amount }]);
     setTimeout(() => {
@@ -197,55 +202,11 @@ export default function App() {
     }
   };
 
-  const renderPage = () => {
-    switch(currentPage) {
-      case 'home':
-        return <HeroSection 
-          streak={streak} xp={xp} level={level} levelTitle={levelTitle}
-          feedItems={feedItems} earnXP={earnXP} setCurrentPage={setCurrentPage}
-          terminalInValue={terminalInValue} setTerminalInValue={setTerminalInValue}
-          terminalOutLines={terminalOutLines} handleTerminalSubmit={handleTerminalSubmit}
-          terminalInputRef={terminalInputRef}
-        />;
-      case 'how-it-works':
-        return <HowItWorksSection setCurrentPage={setCurrentPage} />;
-      case 'sprint':
-        return <CodingSprintSection />;
-      case 'build-sprint':
-        return <BuildSprintSection />;
-      case 'buddy-system':
-        return <BuddySystemSection 
-          earnXP={earnXP} setStreak={setStreak} 
-          scheduledSessions={scheduledSessions} setScheduledSessions={setScheduledSessions}
-          appendTerminalOutput={appendTerminalOutput}
-        />;
-      case 'xp-system':
-        return <XpSystemSection 
-          xp={xp} level={level} levelTitle={levelTitle} 
-          badges={badges} leaderboardData={leaderboardData} earnXP={earnXP}
-        />;
-      case 'daily-cycle':
-        return <DailyCycleSection />;
-      case 'apply-now':
-        return <ApplySection />;
-      case 'faq':
-        return <FaqSection />;
-      default:
-        return <HeroSection 
-          streak={streak} xp={xp} level={level} levelTitle={levelTitle}
-          feedItems={feedItems} earnXP={earnXP} setCurrentPage={setCurrentPage}
-          terminalInValue={terminalInValue} setTerminalInValue={setTerminalInValue}
-          terminalOutLines={terminalOutLines} handleTerminalSubmit={handleTerminalSubmit}
-          terminalInputRef={terminalInputRef}
-        />;
-    }
-  };
-
   return (
     <div className="dark-theme">
       {floatingPopups.map((p) => (
-        <div 
-          key={p.id} 
+        <div
+          key={p.id}
           className="xp-popup-fly"
           style={{
             left: "50%",
@@ -261,16 +222,56 @@ export default function App() {
       <div className="glow-orb orb-1"></div>
       <div className="glow-orb orb-2"></div>
 
-      <Header 
-        currentPage={currentPage} setCurrentPage={setCurrentPage} 
-        xp={xp} consoleGlitch={consoleGlitch} setConsoleGlitch={setConsoleGlitch} 
-      />
+      {!isHome && !isApply && (
+        <Header
+          xp={xp} consoleGlitch={consoleGlitch} setConsoleGlitch={setConsoleGlitch}
+        />
+      )}
 
       <main>
-        {renderPage()}
+        <Routes>
+          <Route path="/" element={
+            <HeroSection
+              streak={streak} xp={xp} level={level} levelTitle={levelTitle}
+              feedItems={feedItems} earnXP={earnXP}
+              terminalInValue={terminalInValue} setTerminalInValue={setTerminalInValue}
+              terminalOutLines={terminalOutLines} handleTerminalSubmit={handleTerminalSubmit}
+              terminalInputRef={terminalInputRef}
+            />
+          } />
+          <Route path="/how-it-works" element={<HowItWorksSection />} />
+          <Route path="/sprint" element={<CodingSprintSection />} />
+          <Route path="/build-sprint" element={<BuildSprintSection />} />
+          <Route path="/buddy-system" element={
+            <BuddySystemSection
+              earnXP={earnXP} setStreak={setStreak}
+              scheduledSessions={scheduledSessions} setScheduledSessions={setScheduledSessions}
+              appendTerminalOutput={appendTerminalOutput}
+            />
+          } />
+          <Route path="/xp-system" element={
+            <XpSystemSection
+              xp={xp} level={level} levelTitle={levelTitle}
+              badges={badges} leaderboardData={leaderboardData} earnXP={earnXP}
+            />
+          } />
+          <Route path="/daily-cycle" element={<DailyCycleSection />} />
+          <Route path="/apply-now" element={<ApplySection />} />
+          <Route path="/faq" element={<FaqSection />} />
+          <Route path="/weekly-system" element={<WeeklySystemSection />} />
+          <Route path="*" element={
+            <HeroSection
+              streak={streak} xp={xp} level={level} levelTitle={levelTitle}
+              feedItems={feedItems} earnXP={earnXP}
+              terminalInValue={terminalInValue} setTerminalInValue={setTerminalInValue}
+              terminalOutLines={terminalOutLines} handleTerminalSubmit={handleTerminalSubmit}
+              terminalInputRef={terminalInputRef}
+            />
+          } />
+        </Routes>
       </main>
 
-      <Footer setCurrentPage={setCurrentPage} />
+      <Footer />
     </div>
   );
 }
