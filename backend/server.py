@@ -31,7 +31,9 @@ async def register(data: dict):
         "name":data["name"],
         "email":data["email"],
         "github":data["github"],
-        "discord":data["discord"],
+        "password":data["password"]
     })
     return {"message": "User registered successfully"}
+
+
 
