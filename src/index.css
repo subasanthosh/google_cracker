@@ -48,7 +48,6 @@ body.console-glitch-mode {
 * {
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
 }
 
 html {
@@ -62,7 +61,7 @@ body {
     background-color: var(--bg-base);
     line-height: 1.6;
     overflow-x: hidden;
-    position: relative;
+
 }
 
 #root {
@@ -73,7 +72,7 @@ body {
     border-inline: none;
     min-height: auto;
     display: block;
-    box-sizing: border-box;
+  
 }
 
 .mono-font {
@@ -270,6 +269,7 @@ p {
     font-size: 0.95rem;
     text-decoration: none;
     letter-spacing: 0.02em;
+    white-space: nowrap;
 }
 
 .btn-primary {
@@ -328,12 +328,13 @@ p {
 }
 
 .header-container {
-    max-width: 1200px;
+    max-width: 100%;
     margin: 0 auto;
     padding: 1.2rem 2rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 2rem;
 }
 
 .logo a {
@@ -357,6 +358,8 @@ p {
 .nav-links {
     display: flex;
     gap: 1.75rem;
+    flex: 1;
+    justify-content: space-evenly;
 }
 
 .nav-link {
@@ -366,6 +369,7 @@ p {
     font-weight: 600;
     transition: var(--transition-smooth);
     position: relative;
+    white-space: nowrap;
 }
 
 .nav-link:hover {

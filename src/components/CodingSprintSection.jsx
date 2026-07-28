@@ -3,7 +3,7 @@ import { Zap, Code2, MessageSquare, Trophy, FileCode, Copy, CheckCircle, Clock, 
 import { codeSnippets } from '../constants';
 
 export default function CodingSprintSection() {
-  const [activeTab, setActiveTab] = useState("practice");
+  const [activeTab, setActiveTab] = useState("daily");
   const [lang, setLang] = useState("python");
   const [isCopied, setIsCopied] = useState(false);
   const [contestCountdown, setContestCountdown] = useState("00d : 00h : 00m : 00s");
@@ -41,34 +41,28 @@ export default function CodingSprintSection() {
     <section className="coding-sprint-section" id="coding-sprint">
       <div className="container">
         <div className="section-header text-center">
-          <h2 className="section-title">Weekly Coding Sprint</h2>
+          <h2 className="section-title">Coding Sprints</h2>
           <p className="section-subtitle text-muted">Sharpen your logic, write high-performance solutions, and climb the scoreboard.</p>
         </div>
 
         <div className="tabs-container">
           <div className="tabs-header" id="coding-sprint-tabs">
             <button 
-              className={`tab-btn ${activeTab === 'practice' ? 'active' : ''}`}
-              onClick={() => setActiveTab("practice")}
+              className={`tab-btn ${activeTab === 'daily' ? 'active' : ''}`}
+              onClick={() => setActiveTab("daily")}
             >
-              <Code2 size={16} style={{ marginRight: '6px' }} /> Practice Sandbox
+              <Code2 size={16} style={{ marginRight: '6px' }} /> Daily Sprint
             </button>
             <button 
-              className={`tab-btn ${activeTab === 'review' ? 'active' : ''}`}
-              onClick={() => setActiveTab("review")}
+              className={`tab-btn ${activeTab === 'weekly' ? 'active' : ''}`}
+              onClick={() => setActiveTab("weekly")}
             >
-              <MessageSquare size={16} style={{ marginRight: '6px' }} /> Peer Review
-            </button>
-            <button 
-              className={`tab-btn ${activeTab === 'contest' ? 'active' : ''}`}
-              onClick={() => setActiveTab("contest")}
-            >
-              <Trophy size={16} style={{ marginRight: '6px' }} /> Live Contest & Meet
+              <Trophy size={16} style={{ marginRight: '6px' }} /> Weekly Sprint
             </button>
           </div>
 
-          {/* Tab 1: Practice */}
-          <div className={`tab-content ${activeTab === 'practice' ? 'active' : ''}`} id="tab-practice">
+          {/* Tab 1: Daily Sprint */}
+          <div className={`tab-content ${activeTab === 'daily' ? 'active' : ''}`} id="tab-daily">
             <div className="sprint-grid">
               <div className="challenge-info glass-card">
                 <div className="challenge-meta">
@@ -103,47 +97,12 @@ export default function CodingSprintSection() {
             </div>
           </div>
 
-          {/* Tab 2: Peer Review */}
-          <div className={`tab-content ${activeTab === 'review' ? 'active' : ''}`} id="tab-review">
-            <div className="peer-review-grid">
-              <div className="review-item-card glass-card">
-                <div className="reviewer-meta">
-                  <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&h=150&q=80" alt="Reviewer" className="avatar-circle sm" />
-                  <div>
-                    <span className="user-handle">@elena_design</span>
-                    <span className="review-time">1 hour ago</span>
-                  </div>
-                  <span className="review-tag approved"><CheckCircle size={14} style={{ marginRight: '4px' }} /> Approved</span>
-                </div>
-                <p className="review-body">Clean implementation of the Sliding Window. Memory complexity is O(k) which is optimal here. I've left a small comment on the deque bounds check, but other than that, it looks excellent.</p>
-                <div className="review-target-snippet">
-                  <code># Elena: Check if deque length exceeds window limits</code>
-                </div>
-              </div>
-
-              <div className="review-item-card glass-card">
-                <div className="reviewer-meta">
-                  <img src="https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&w=150&h=150&q=80" alt="Reviewer" className="avatar-circle sm" />
-                  <div>
-                    <span className="user-handle">@marcus_dev</span>
-                    <span className="review-time">3 hours ago</span>
-                  </div>
-                  <span className="review-tag revision"><Clock size={14} style={{ marginRight: '4px' }} /> Needs Revision</span>
-                </div>
-                <p className="review-body">Your solution works, but it's hitting O(n*k) time complexity in the worst-case scenario. Consider using a Monotonic Deque or Max-Heap to bypass linear scans inside the window loop.</p>
-                <div className="review-target-snippet">
-                  <code># Marcus: Optimize inner loop to achieve O(n) runtime</code>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Tab 3: Live Contest */}
-          <div className={`tab-content ${activeTab === 'contest' ? 'active' : ''}`} id="tab-contest">
+          {/* Tab 2: Weekly Sprint */}
+          <div className={`tab-content ${activeTab === 'weekly' ? 'active' : ''}`} id="tab-weekly">
             <div className="contest-grid">
               <div className="contest-info glass-card border-glow-blue">
                 <span className="badge-sprint">LIVE MATCHUP</span>
-                <h3>Saturday Coding Brawl</h3>
+                <h3>Weekly Coding Sprint</h3>
                 <p>Weekly algorithm races happen live every Saturday. Compete against peers in a race to optimize time complexities. Leaderboard calculations update instantly with penalty times.</p>
                 <div className="countdown-timer-box">
                   <span className="countdown-label">NEXT LIVE CONTEST IN:</span>
