@@ -1,9 +1,10 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Activity } from 'lucide-react';
 import googleWorkspaceBright from '../assets/google_workspace_bright.png';
 
-export default function HeroSection({ 
-  streak, xp, level, levelTitle, feedItems, setCurrentPage,
+export default function HeroSection({
+  streak, xp, level, levelTitle, feedItems,
   terminalInValue, setTerminalInValue, terminalOutLines, handleTerminalSubmit, terminalInputRef
 }) {
   return (
@@ -25,11 +26,11 @@ export default function HeroSection({
             A brutalist 13-month developer sprint focused on <strong>consistency over perfection</strong>. Build daily proof of work, dominate weekly coding contests, and launch production-grade projects.
           </p>
           <div className="hero-ctas">
-            <a href="#" className="btn btn-primary" onClick={(e) => { e.preventDefault(); setCurrentPage('apply-now'); }}>Join the Cohort</a>
-            <a href="#" className="btn btn-secondary" onClick={(e) => { e.preventDefault(); setCurrentPage('how-it-works'); }}>Learn More</a>
-            <a href="#" onClick={(e) => { e.preventDefault(); setCurrentPage('sprint'); }} className="btn btn-primary">Daily/Weekly Coding Sprint</a>
+            <Link to="/apply-now" className="btn btn-primary">Join the Cohort</Link>
+            <Link to="/how-it-works" className="btn btn-secondary">Learn More</Link>
+            <Link to="/sprint" className="btn btn-primary">Daily/Weekly Coding Sprint</Link>
           </div>
-          
+
           <div className="activity-feed-wrapper">
             <div className="feed-header">
               <span className="feed-title"><Activity size={16} style={{ marginRight: '6px' }} /> Cohort Pulse (Live Feed)</span>
@@ -83,9 +84,9 @@ export default function HeroSection({
                       levelClass = "level-3";
                     }
                     return (
-                      <div 
-                        key={i} 
-                        className={`streak-day ${levelClass}`} 
+                      <div
+                        key={i}
+                        className={`streak-day ${levelClass}`}
                         title={`Day ${i + 1}: Activity Level`}
                       />
                     );
@@ -103,11 +104,11 @@ export default function HeroSection({
 
               <div className="terminal-prompt-line">
                 <span className="prompt-text">velocity-cohort $</span>
-                <input 
-                  type="text" 
-                  className="terminal-input" 
-                  id="terminal-input" 
-                  placeholder="Type 'help' or 'claim'..." 
+                <input
+                  type="text"
+                  className="terminal-input"
+                  id="terminal-input"
+                  placeholder="Type 'help' or 'claim'..."
                   ref={terminalInputRef}
                   value={terminalInValue}
                   onChange={(e) => setTerminalInValue(e.target.value)}
@@ -116,10 +117,10 @@ export default function HeroSection({
               </div>
               <div className="terminal-output" id="terminal-output">
                 {terminalOutLines.slice(-3).map((line, idx) => (
-                  <span 
-                    key={idx} 
-                    style={{ 
-                      color: line.type === "sys" ? "var(--color-neon-green)" : 
+                  <span
+                    key={idx}
+                    style={{
+                      color: line.type === "sys" ? "var(--color-neon-green)" :
                              line.type === "error" ? "var(--color-crimson)" : "inherit",
                       display: 'block'
                     }}

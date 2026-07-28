@@ -1,7 +1,8 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { MessageSquare, Activity } from 'lucide-react';
 
-export default function Footer({ setCurrentPage }) {
+export default function Footer() {
   return (
     <footer className="main-footer">
       <div className="container footer-grid">
@@ -16,15 +17,15 @@ export default function Footer({ setCurrentPage }) {
         </div>
         <div className="footer-nav">
           <h4>Navigation</h4>
-          <a href="#" onClick={(e) => { e.preventDefault(); setCurrentPage('how-it-works'); }}>How It Works</a>
-          <a href="#" onClick={(e) => { e.preventDefault(); setCurrentPage('sprint'); }}>Weekly Sprint</a>
-          <a href="#" onClick={(e) => { e.preventDefault(); setCurrentPage('buddy-system'); }}>Buddy Network</a>
+          <Link to="/how-it-works">How It Works</Link>
+          <Link to="/sprint">Weekly Sprint</Link>
+          <Link to="/buddy-system">Buddy Network</Link>
         </div>
         <div className="footer-nav">
-          <h4>Legal & Info</h4>
+          <h4>Legal &amp; Info</h4>
           <a href="#">Privacy Policy</a>
           <a href="#">Terms of Play</a>
-          <a href="#" onClick={(e) => { e.preventDefault(); setCurrentPage('faq'); }}>FAQ</a>
+          <Link to="/faq">FAQ</Link>
         </div>
       </div>
       <div className="footer-bottom text-center">

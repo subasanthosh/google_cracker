@@ -1,25 +1,27 @@
 import React, { useState } from 'react';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { Zap, Terminal, Menu, Monitor, X } from 'lucide-react';
 
-export default function Header({ currentPage, setCurrentPage, xp, consoleGlitch, setConsoleGlitch }) {
+export default function Header({ xp, consoleGlitch, setConsoleGlitch }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <>
       <header className="main-header">
         <div className="header-container">
           <div className="logo">
-            <a href="#" onClick={(e) => { e.preventDefault(); setCurrentPage('home'); }}>
+            <Link to="/">
               <span className="logo-prompt">&gt;</span> VELOCITY<span className="logo-accent">_13</span>
-            </a>
+            </Link>
           </div>
           <nav className="nav-links">
-            <a href="#" className="nav-link" onClick={(e) => { e.preventDefault(); setCurrentPage('how-it-works'); }}>How It Works</a>
-            <a href="#" className="nav-link" onClick={(e) => { e.preventDefault(); setCurrentPage('weekly-system'); }}>Weekly System</a>
-            <a href="#" className="nav-link" onClick={(e) => { e.preventDefault(); setCurrentPage('sprint'); }}>Daily / Weekly Coding Sprint</a>
-            <a href="#" className="nav-link" onClick={(e) => { e.preventDefault(); setCurrentPage('buddy-system'); }}>Buddy System</a>
-            <a href="#" className="nav-link" onClick={(e) => { e.preventDefault(); setCurrentPage('xp-system'); }}>XP Dashboard</a>
-            <a href="#" className="nav-link" onClick={(e) => { e.preventDefault(); setCurrentPage('daily-cycle'); }}>Daily Cycle</a>
+            <NavLink to="/how-it-works" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>How It Works</NavLink>
+            <NavLink to="/weekly-system" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>Weekly System</NavLink>
+            <NavLink to="/sprint" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>Daily / Weekly Coding Sprint</NavLink>
+            <NavLink to="/buddy-system" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>Buddy System</NavLink>
+            <NavLink to="/xp-system" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>XP Dashboard</NavLink>
+            <NavLink to="/daily-cycle" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>Daily Cycle</NavLink>
           </nav>
           <div className="header-actions">
             <div className="user-xp-status" id="header-xp-badge">
@@ -27,26 +29,18 @@ export default function Header({ currentPage, setCurrentPage, xp, consoleGlitch,
               <span className="xp-value" id="current-xp-header">{xp}</span>
               <span className="xp-label">XP</span>
             </div>
-            <button 
-              className="theme-toggle" 
-              id="console-theme-btn" 
+            <button
+              className="theme-toggle"
+              id="console-theme-btn"
               title="Toggle Console Glitch Mode"
               onClick={() => setConsoleGlitch(!consoleGlitch)}
             >
               {consoleGlitch ? <Monitor size={18} /> : <Terminal size={18} />}
             </button>
-            <a 
-              href="#" 
-              className="nav-link mono-font" 
-              onClick={(e) => { e.preventDefault(); setCurrentPage('login'); }}
-              style={{ fontSize: '0.9rem', color: 'var(--color-electric-blue)', textDecoration: 'none', marginRight: '0.5rem' }}
-            >
-              [ SIGN_IN ]
-            </a>
-            <a href="#" className="btn btn-primary btn-lg" onClick={(e) => { e.preventDefault(); setCurrentPage('apply-now'); }}>Apply Now</a>
+            <Link to="/apply-now" className="btn btn-primary btn-lg">Apply Now</Link>
           </div>
-          <button 
-            className="mobile-menu-toggle" 
+          <button
+            className="mobile-menu-toggle"
             id="menu-toggle"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
@@ -56,15 +50,14 @@ export default function Header({ currentPage, setCurrentPage, xp, consoleGlitch,
       </header>
 
       <div className={`mobile-nav ${mobileMenuOpen ? 'active' : ''}`} id="mobile-nav">
-        <a href="#" className="mobile-nav-link" onClick={(e) => { e.preventDefault(); setMobileMenuOpen(false); setCurrentPage('how-it-works'); }}>How It Works</a>
-        <a href="#" className="mobile-nav-link" onClick={(e) => { e.preventDefault(); setMobileMenuOpen(false); setCurrentPage('sprint'); }}>Coding Sprint</a>
-        <a href="#" className="mobile-nav-link" onClick={(e) => { e.preventDefault(); setMobileMenuOpen(false); setCurrentPage('build-sprint'); }}>Build Sprint</a>
-        <a href="#" className="mobile-nav-link" onClick={(e) => { e.preventDefault(); setMobileMenuOpen(false); setCurrentPage('buddy-system'); }}>Buddy System</a>
-        <a href="#" className="mobile-nav-link" onClick={(e) => { e.preventDefault(); setMobileMenuOpen(false); setCurrentPage('xp-system'); }}>XP Dashboard</a>
-        <a href="#" className="mobile-nav-link" onClick={(e) => { e.preventDefault(); setMobileMenuOpen(false); setCurrentPage('daily-cycle'); }}>Daily Cycle</a>
-        <div className="mobile-nav-footer" style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-          <a href="#" className="btn btn-primary w-full text-center" onClick={(e) => { e.preventDefault(); setMobileMenuOpen(false); setCurrentPage('apply-now'); }}>Apply Now</a>
-          <a href="#" className="btn btn-secondary w-full text-center font-mono" onClick={(e) => { e.preventDefault(); setMobileMenuOpen(false); setCurrentPage('login'); }}>Candidate Login</a>
+        <Link to="/how-it-works" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>How It Works</Link>
+        <Link to="/sprint" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Coding Sprint</Link>
+        <Link to="/build-sprint" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Build Sprint</Link>
+        <Link to="/buddy-system" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Buddy System</Link>
+        <Link to="/xp-system" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>XP Dashboard</Link>
+        <Link to="/daily-cycle" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Daily Cycle</Link>
+        <div className="mobile-nav-footer">
+          <Link to="/apply-now" className="btn btn-primary w-full text-center" onClick={() => setMobileMenuOpen(false)}>Apply Now</Link>
         </div>
       </div>
     </>
