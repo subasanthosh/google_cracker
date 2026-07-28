@@ -22,7 +22,7 @@ export default function Register({ earnXP }) {
       return;
     }
 
-  await fetch("https://counts-trout-variables-begun.trycloudflare.com/registerinpage",{
+  await fetch("http://127.0.0.1:8000/registerinpage",{
     headers:{"Content-Type": "application/json",},
     method:"POST",
     body:JSON.stringify({
