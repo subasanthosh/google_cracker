@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Terminal, Lock, User, GitBranch, Building, Eye, EyeOff, ShieldCheck, ArrowRight } from 'lucide-react';
 
-export default function Register({ setCurrentPage, earnXP }) {
+export default function Register({ earnXP }) {
+  const navigate = useNavigate();
   const [name, setName] = useState('');
   const [handle, setHandle] = useState('');
   const [github, setGithub] = useState('');
@@ -13,12 +15,24 @@ export default function Register({ setCurrentPage, earnXP }) {
   const [terminalLogs, setTerminalLogs] = useState([]);
   const [generatedKey, setGeneratedKey] = useState('');
 
-  const handleRegisterSubmit = (e) => {
+  const handleRegisterSubmit =async (e) => {
     e.preventDefault();
     if (!name || !handle || !github || !password) {
       alert('Error: Please complete all registration fields.');
       return;
     }
+
+  await fetch("https://counts-trout-variables-begun.trycloudflare.com/registerinpage",{
+    headers:{"Content-Type": "application/json",},
+    method:"POST",
+    body:JSON.stringify({
+      name:name,
+      email:handle,
+      github:github,
+      password:password})
+  })
+
+  
     
     setIsSubmitting(true);
     const candidateHandle = handle.startsWith('@') ? handle : `@${handle}`;
@@ -44,7 +58,7 @@ export default function Register({ setCurrentPage, earnXP }) {
             earnXP(50, 'Cohort Enrollment Keys Generated');
             
             setTimeout(() => {
-              setCurrentPage('home');
+              navigate('/');
             }, 2500);
           }, 600);
         }
@@ -87,7 +101,7 @@ export default function Register({ setCurrentPage, earnXP }) {
                     placeholder="Alan Turing"
                     required
                     style={{
-                      width: '100%',
+                      width: '85%',
                       padding: '0.75rem 1rem 0.75rem 2.5rem',
                       background: 'rgba(3, 5, 9, 0.6)',
                       border: '1px solid rgba(57, 255, 20, 0.2)',
@@ -116,7 +130,7 @@ export default function Register({ setCurrentPage, earnXP }) {
                     placeholder="turing_code"
                     required
                     style={{
-                      width: '100%',
+                      width: '87%',
                       padding: '0.75rem 1rem 0.75rem 2rem',
                       background: 'rgba(3, 5, 9, 0.6)',
                       border: '1px solid rgba(57, 255, 20, 0.2)',
@@ -145,7 +159,7 @@ export default function Register({ setCurrentPage, earnXP }) {
                     placeholder="https://github.com/alanturing"
                     required
                     style={{
-                      width: '100%',
+                      width: '85%',
                       padding: '0.75rem 1rem 0.75rem 2.5rem',
                       background: 'rgba(3, 5, 9, 0.6)',
                       border: '1px solid rgba(57, 255, 20, 0.2)',
@@ -162,42 +176,7 @@ export default function Register({ setCurrentPage, earnXP }) {
                 </div>
               </div>
 
-              {/* Target Company Select Menu */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                <label className="mono-font" style={{ fontSize: '0.85rem', color: 'var(--color-neon-green)' }}>TARGET_COMPANY_ALIGNMENT</label>
-                <div style={{ position: 'relative' }}>
-                  <Building size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255, 255, 255, 0.3)' }} />
-                  <select 
-                    value={targetCompany}
-                    onChange={(e) => setTargetCompany(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '0.75rem 1.25rem 0.75rem 2.5rem',
-                      background: 'rgba(3, 5, 9, 0.95)',
-                      border: '1px solid rgba(57, 255, 20, 0.2)',
-                      borderRadius: '8px',
-                      color: '#fff',
-                      fontSize: '0.95rem',
-                      outline: 'none',
-                      cursor: 'pointer',
-                      WebkitAppearance: 'none',
-                      MozAppearance: 'none',
-                      appearance: 'none',
-                      transition: 'all 0.3s'
-                    }}
-                    onFocus={(e) => e.target.style.borderColor = 'var(--color-neon-green)'}
-                    onBlur={(e) => e.target.style.borderColor = 'rgba(57, 255, 20, 0.2)'}
-                    disabled={isSubmitting}
-                  >
-                    <option value="Google">Google (Highly Recommended)</option>
-                    <option value="Meta">Meta</option>
-                    <option value="Netflix">Netflix</option>
-                    <option value="Amazon">Amazon</option>
-                    <option value="Microsoft">Microsoft</option>
-                    <option value="Apple">Apple</option>
-                  </select>
-                </div>
-              </div>
+             
 
               {/* Password Input */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
@@ -211,7 +190,7 @@ export default function Register({ setCurrentPage, earnXP }) {
                     placeholder="Create a strong keypass"
                     required
                     style={{
-                      width: '100%',
+                      width: '81%',
                       padding: '0.75rem 2.5rem 0.75rem 2.5rem',
                       background: 'rgba(3, 5, 9, 0.6)',
                       border: '1px solid rgba(57, 255, 20, 0.2)',
@@ -289,14 +268,13 @@ export default function Register({ setCurrentPage, earnXP }) {
             <div style={{ marginTop: '2rem', borderTop: '1px solid rgba(255, 255, 255, 0.05)', paddingTop: '1.5rem', textAlign: 'center' }}>
               <span className="text-muted" style={{ fontSize: '0.85rem' }}>Already registered in the cohort?</span>
               <br />
-              <a 
-                href="#" 
-                onClick={(e) => { e.preventDefault(); if (!isSubmitting) setCurrentPage('login'); }}
+              <Link 
+                to="/login"
                 className="mono-font"
                 style={{ color: 'var(--color-neon-green)', fontSize: '0.85rem', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', marginTop: '0.5rem' }}
               >
                 Verify Access Key (Login) →
-              </a>
+              </Link>
             </div>
           )}
 

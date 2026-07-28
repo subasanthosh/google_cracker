@@ -6,5 +6,3 @@ app = FastAPI()
 def home():
     return {"message": "Google Cracker"}
 
-
-

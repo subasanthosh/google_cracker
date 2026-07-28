@@ -26,9 +26,8 @@ export default function HeroSection({
             A brutalist 13-month developer sprint focused on <strong>consistency over perfection</strong>. Build daily proof of work, dominate weekly coding contests, and launch production-grade projects.
           </p>
           <div className="hero-ctas">
-            <Link to="/apply-now" className="btn btn-primary">Join the Cohort</Link>
-            <Link to="/how-it-works" className="btn btn-secondary">Learn More</Link>
-            <Link to="/sprint" className="btn btn-primary">Daily/Weekly Coding Sprint</Link>
+            <Link to="/register" className="btn btn-primary">Join the Cohort</Link>
+            <Link to="/login" className="btn btn-secondary">Already a Member</Link>
           </div>
 
           <div className="activity-feed-wrapper">

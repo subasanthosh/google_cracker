@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Terminal, Lock, User, Eye, EyeOff, ShieldAlert, Key, ArrowRight } from 'lucide-react';
 
-export default function Login({ setCurrentPage, earnXP }) {
+export default function Login({ earnXP }) {
   const [handle, setHandle] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [terminalLogs, setTerminalLogs] = useState([]);
   const [errorMsg, setErrorMsg] = useState('');
+  const navigate = useNavigate();
 
   const handleLoginSubmit = (e) => {
     e.preventDefault();
@@ -33,7 +35,7 @@ export default function Login({ setCurrentPage, earnXP }) {
           setTimeout(() => {
             setIsSubmitting(false);
             earnXP(20, 'Console Access Authenticated');
-            setCurrentPage('home');
+            navigate('/');
           }, 800);
         }
       }, (index + 1) * 400);
@@ -158,14 +160,13 @@ export default function Login({ setCurrentPage, earnXP }) {
           <div style={{ marginTop: '2rem', borderTop: '1px solid rgba(255, 255, 255, 0.05)', paddingTop: '1.5rem', textAlign: 'center' }}>
             <span className="text-muted" style={{ fontSize: '0.85rem' }}>No cohort registration yet?</span>
             <br />
-            <a 
-              href="#" 
-              onClick={(e) => { e.preventDefault(); if (!isSubmitting) setCurrentPage('register'); }}
+            <Link 
+              to="/register"
               className="mono-font"
               style={{ color: 'var(--color-electric-blue)', fontSize: '0.85rem', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', marginTop: '0.5rem' }}
             >
               <Key size={14} /> Generate Access Key (Register)
-            </a>
+            </Link>
           </div>
 
         </div>

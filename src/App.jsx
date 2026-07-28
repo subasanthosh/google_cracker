@@ -14,6 +14,8 @@ import DailyCycleSection from './components/DailyCycleSection';
 import ApplySection from './components/ApplySection';
 import FaqSection from './components/FaqSection';
 import WeeklySystemSection from './components/WeeklySystemSection';
+import Login from './components/Login';
+import Register from './components/Register';
 
 import { initialLeaderboard } from './constants';
 
@@ -259,6 +261,8 @@ export default function App() {
           <Route path="/apply-now" element={<ApplySection />} />
           <Route path="/faq" element={<FaqSection />} />
           <Route path="/weekly-system" element={<WeeklySystemSection />} />
+          <Route path="/login" element={<Login earnXP={earnXP} />} />
+          <Route path="/register" element={<Register earnXP={earnXP} />} />
           <Route path="*" element={
             <HeroSection
               streak={streak} xp={xp} level={level} levelTitle={levelTitle}
