@@ -17,7 +17,6 @@ export default function Footer({ setCurrentPage }) {
         <div className="footer-nav">
           <h4>Navigation</h4>
           <a href="#" onClick={(e) => { e.preventDefault(); setCurrentPage('how-it-works'); }}>How It Works</a>
-          <a href="#" onClick={(e) => { e.preventDefault(); setCurrentPage('weekly-system'); }}>Weekly System</a>
           <a href="#" onClick={(e) => { e.preventDefault(); setCurrentPage('sprint'); }}>Weekly Sprint</a>
           <a href="#" onClick={(e) => { e.preventDefault(); setCurrentPage('buddy-system'); }}>Buddy Network</a>
         </div>

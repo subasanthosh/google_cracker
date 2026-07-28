@@ -5,7 +5,6 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import HeroSection from './components/HeroSection';
 import HowItWorksSection from './components/HowItWorksSection';
-import WeeklySystemSection from './components/WeeklySystemSection';
 import CodingSprintSection from './components/CodingSprintSection';
 import BuildSprintSection from './components/BuildSprintSection';
 import BuddySystemSection from './components/BuddySystemSection';
@@ -209,9 +208,7 @@ export default function App() {
           terminalInputRef={terminalInputRef}
         />;
       case 'how-it-works':
-        return <HowItWorksSection />;
-      case 'weekly-system':
-        return <WeeklySystemSection />;
+        return <HowItWorksSection setCurrentPage={setCurrentPage} />;
       case 'sprint':
         return <CodingSprintSection />;
       case 'build-sprint':

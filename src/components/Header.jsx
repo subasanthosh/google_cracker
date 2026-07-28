@@ -15,7 +15,6 @@ export default function Header({ currentPage, setCurrentPage, xp, consoleGlitch,
           </div>
           <nav className="nav-links">
             <a href="#" className="nav-link" onClick={(e) => { e.preventDefault(); setCurrentPage('how-it-works'); }}>How It Works</a>
-            <a href="#" className="nav-link" onClick={(e) => { e.preventDefault(); setCurrentPage('weekly-system'); }}>Weekly System</a>
             <a href="#" className="nav-link" onClick={(e) => { e.preventDefault(); setCurrentPage('sprint'); }}>Coding Sprint</a>
             <a href="#" className="nav-link" onClick={(e) => { e.preventDefault(); setCurrentPage('build-sprint'); }}>Build Sprint</a>
             <a href="#" className="nav-link" onClick={(e) => { e.preventDefault(); setCurrentPage('buddy-system'); }}>Buddy System</a>
@@ -48,10 +47,8 @@ export default function Header({ currentPage, setCurrentPage, xp, consoleGlitch,
         </div>
       </header>
 
-      {/* Mobile Navigation Drawer */}
       <div className={`mobile-nav ${mobileMenuOpen ? 'active' : ''}`} id="mobile-nav">
         <a href="#" className="mobile-nav-link" onClick={(e) => { e.preventDefault(); setMobileMenuOpen(false); setCurrentPage('how-it-works'); }}>How It Works</a>
-        <a href="#" className="mobile-nav-link" onClick={(e) => { e.preventDefault(); setMobileMenuOpen(false); setCurrentPage('weekly-system'); }}>Weekly System</a>
         <a href="#" className="mobile-nav-link" onClick={(e) => { e.preventDefault(); setMobileMenuOpen(false); setCurrentPage('sprint'); }}>Coding Sprint</a>
         <a href="#" className="mobile-nav-link" onClick={(e) => { e.preventDefault(); setMobileMenuOpen(false); setCurrentPage('build-sprint'); }}>Build Sprint</a>
         <a href="#" className="mobile-nav-link" onClick={(e) => { e.preventDefault(); setMobileMenuOpen(false); setCurrentPage('buddy-system'); }}>Buddy System</a>
