@@ -59,67 +59,64 @@ export default function Register({ earnXP }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [terminalLogs, setTerminalLogs] = useState([]);
   const [generatedKey, setGeneratedKey] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
 
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
     if (!name || !handle || !github || !password) {
-      alert('Error: Please complete all registration fields.');
+      setErrorMsg('INPUT_ERR: Please complete all registration fields.');
       return;
     }
-    // https://counts-trout-variables-begun.trycloudflare.com/registerinpage
-    await fetch("http://127.0.0.1:8000/registerinpage", {
-      headers: { "Content-Type": "application/json" },
-      method: "POST",
-      body: JSON.stringify({ name, email: handle, github, password })
-    });
 
-  const response = await fetch("http://127.0.0.1:8000/registerinpage",{
-    headers:{"Content-Type": "application/json",},
-    method:"POST",
-    body:JSON.stringify({
-      name:name,
-      email:handle,
-      github:github,
-      password:password})
-  })
-
-  const data = await response.json();
-  if(data.message === "User already exists"){
-    alert("Error: User already exists. Please login instead.");
-    return;
-  }
-  
-    
+    setErrorMsg('');
     setIsSubmitting(true);
-    const candidateHandle = handle.startsWith('@') ? handle : `@${handle}`;
 
-    const logs = [
-      `Registering new cohort profile: ${name}...`,
-      `Setting candidate handle: ${candidateHandle}...`,
-      `Validating GitHub repository access parameters...`,
-      `Target company flag set to: [${targetCompany.toUpperCase()}]`,
-      `Cryptographic security key generation in progress...`
-    ];
+    try {
+      const res = await fetch('http://127.0.0.1:8000/registerinpage', {
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+        body: JSON.stringify({ name, email: handle, github, password }),
+      });
 
-    logs.forEach((log, index) => {
-      setTimeout(() => {
-        setTerminalLogs(prev => [...prev, log]);
-        if (index === logs.length - 1) {
-          const randomHex = () => Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1).toUpperCase();
-          const mockKey = `VELOCITY-${randomHex()}-${randomHex()}`;
+      const data = await res.json();
 
-          setTimeout(() => {
-            setGeneratedKey(mockKey);
-            setIsSubmitting(false);
-            earnXP(50, 'Cohort Enrollment Keys Generated');
+      if (!res.ok) {
+        /* FastAPI HTTPException sends { detail: "..." } */
+        setErrorMsg(`REG_ERR [${res.status}]: ${data.detail ?? 'Registration failed'}`);
+        setIsSubmitting(false);
+        return;
+      }
 
+      /* ── Success: animate terminal logs then show key ── */
+      const candidateHandle = handle.startsWith('@') ? handle : `@${handle}`;
+      const logs = [
+        `Registering new cohort profile: ${name}...`,
+        `Setting candidate handle: ${candidateHandle}...`,
+        `Validating GitHub repository access parameters...`,
+        `Target company flag set to: [${(targetCompany ?? 'Google').toUpperCase()}]`,
+        `Cryptographic security key generation in progress...`,
+      ];
+
+      logs.forEach((log, index) => {
+        setTimeout(() => {
+          setTerminalLogs(prev => [...prev, log]);
+          if (index === logs.length - 1) {
+            const randomHex = () => Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1).toUpperCase();
+            const mockKey = `VELOCITY-${randomHex()}-${randomHex()}`;
             setTimeout(() => {
-              navigate('/');
-            }, 2500);
-          }, 600);
-        }
-      }, (index + 1) * 350);
-    });
+              setGeneratedKey(mockKey);
+              setIsSubmitting(false);
+              earnXP(50, 'Cohort Enrollment Keys Generated');
+              setTimeout(() => navigate('/'), 2500);
+            }, 600);
+          }
+        }, (index + 1) * 350);
+      });
+
+    } catch (err) {
+      setErrorMsg(`NETWORK_ERR: Cannot reach server. ${err.message}`);
+      setIsSubmitting(false);
+    }
   };
 
   const onFocusGreen = (e) => { e.target.style.borderColor = '#39ff14'; e.target.style.boxShadow = '0 0 0 3px rgba(57,255,20,0.13)'; };
@@ -242,6 +239,13 @@ export default function Register({ earnXP }) {
                 </div>
               </div>
 
+              {/* Error */}
+              {errorMsg && (
+                <div style={{ fontSize: '0.8rem', color: '#ff4d6d', display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255,0,85,0.10)', padding: '0.75rem 1rem', borderRadius: '8px', border: '1px solid rgba(255,0,85,0.28)', fontFamily: 'var(--font-mono)' }}>
+                  <span style={{ fontSize: '1rem' }}>⚠</span> {errorMsg}
+                </div>
+              )}
+
               {/* Terminal logs */}
               {terminalLogs.length > 0 && (
                 <div style={{ fontSize: '0.74rem', background: 'rgba(0,0,0,0.60)', border: '1px solid rgba(57,255,20,0.20)', padding: '0.9rem 1rem', borderRadius: '8px', color: '#39ff14', display: 'flex', flexDirection: 'column', gap: '4px', fontFamily: 'var(--font-mono)' }}>
@@ -251,10 +255,12 @@ export default function Register({ earnXP }) {
                 </div>
               )}
 
+
               {/* Submit */}
               <button
                 type="submit"
                 disabled={isSubmitting}
+                className={`btn-ripple${isSubmitting ? ' btn-loading' : ''}`}
                 style={{
                   width: '100%',
                   padding: '0.85rem',
@@ -263,7 +269,9 @@ export default function Register({ earnXP }) {
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '10px',
-                  background: 'linear-gradient(135deg, #39ff14 0%, #00c8ff 100%)',
+                  background: isSubmitting
+                    ? 'linear-gradient(135deg, #2acc10 0%, #00a0cc 100%)'
+                    : 'linear-gradient(135deg, #39ff14 0%, #00c8ff 100%)',
                   border: 'none',
                   borderRadius: '10px',
                   color: '#030813',
@@ -271,14 +279,21 @@ export default function Register({ earnXP }) {
                   fontSize: '0.95rem',
                   fontFamily: 'var(--font-mono)',
                   cursor: isSubmitting ? 'not-allowed' : 'pointer',
-                  boxShadow: '0 4px 24px rgba(57,255,20,0.32)',
+                  boxShadow: isSubmitting ? 'none' : '0 4px 24px rgba(57,255,20,0.32)',
                   transition: 'all 0.25s',
                   letterSpacing: '0.05em',
-                  opacity: isSubmitting ? 0.6 : 1,
                 }}
               >
-                Generate Access Keys <ArrowRight size={17} />
+                {isSubmitting ? (
+                  <>
+                    <span className="btn-spinner" style={{ borderTopColor: '#030813' }} />
+                    Generating Keys...
+                  </>
+                ) : (
+                  <>Generate Access Keys <ArrowRight size={17} /></>
+                )}
               </button>
+
 
             </form>
           ) : (

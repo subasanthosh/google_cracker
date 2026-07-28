@@ -362,6 +362,59 @@ p {
     font-size: 0.85rem;
 }
 
+/* ── Button loading / click feedback ── */
+.btn-loading {
+    position: relative;
+    pointer-events: none !important;
+    opacity: 0.70 !important;
+    cursor: not-allowed !important;
+}
+
+/* Spinning ring inside button */
+.btn-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(0, 0, 0, 0.25);
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: btnSpin 0.65s linear infinite;
+    flex-shrink: 0;
+}
+
+@keyframes btnSpin {
+    to { transform: rotate(360deg); }
+}
+
+/* Ripple effect on click */
+.btn-ripple {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-ripple::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.18);
+    border-radius: inherit;
+    opacity: 0;
+    transform: scale(0.6);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    pointer-events: none;
+}
+
+.btn-ripple:active::after {
+    opacity: 1;
+    transform: scale(1);
+    transition: none;
+}
+
+/* Scale-down press feel */
+.btn-ripple:active:not(:disabled) {
+    transform: scale(0.97) !important;
+}
+
 /* ----------------------------------------------------
    6. HEADER & HEADER BRANDING
 ---------------------------------------------------- */
