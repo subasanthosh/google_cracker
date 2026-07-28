@@ -56,43 +56,57 @@ export default function Login({ earnXP }) {
   const [errorMsg, setErrorMsg] = useState('');
   const navigate = useNavigate();
 
-  const handleLoginSubmit =async (e) => {
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
     if (!handle || !password) {
       setErrorMsg('CRITICAL_ERR: Missing authentication credentials.');
       return;
     }
 
-    await fetch("http://127.0.0.1:8000/logininpage", {
-      headers:{"Content-Type": "application/json"},
-      method:"POST",
-      body:JSON.stringify({
-        "email": handle,
-        "password": password
-      })
-    })
     setErrorMsg('');
     setIsSubmitting(true);
 
-    const logs = [
-      `Initializing authentication handshake...`,
-      `Verifying candidate handle: ${handle}...`,
-      `Decrypting access key security layer...`,
-      `Handshake success. Welcome to Velocity Kernel.`
-    ];
+    try {
+      const res = await fetch('http://127.0.0.1:8000/logininpage', {
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+        body: JSON.stringify({ email: handle, password }),
+      });
 
-    logs.forEach((log, index) => {
-      setTimeout(() => {
-        setTerminalLogs(prev => [...prev, log]);
-        if (index === logs.length - 1) {
-          setTimeout(() => {
-            setIsSubmitting(false);
-            earnXP(20, 'Console Access Authenticated');
-            navigate('/');
-          }, 800);
-        }
-      }, (index + 1) * 400);
-    });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setErrorMsg(`AUTH_ERR [${res.status}]: ${data.detail ?? 'Unknown error'}`);
+        setIsSubmitting(false);
+        return;
+      }
+
+      /* ── Success flow ── */
+      const logs = [
+        `Initializing authentication handshake...`,
+        `Verifying candidate handle: ${handle}...`,
+        `Decrypting access key security layer...`,
+        `Handshake success. Welcome to Velocity Kernel.`,
+      ];
+
+      logs.forEach((log, index) => {
+        setTimeout(() => {
+          setTerminalLogs(prev => [...prev, log]);
+          if (index === logs.length - 1) {
+            setTimeout(() => {
+              setIsSubmitting(false);
+              earnXP(20, 'Console Access Authenticated');
+              navigate('/');
+            }, 800);
+          }
+        }, (index + 1) * 400);
+      });
+
+    } catch (err) {
+      /* Network / CORS / server-down errors */
+      setErrorMsg(`NETWORK_ERR: Cannot reach server. ${err.message}`);
+      setIsSubmitting(false);
+    }
   };
 
   const onFocusBlue = (e) => { e.target.style.borderColor = '#00f0ff'; e.target.style.boxShadow = '0 0 0 3px rgba(0,240,255,0.14)'; };
@@ -194,6 +208,7 @@ export default function Login({ earnXP }) {
             <button
               type="submit"
               disabled={isSubmitting}
+              className={`btn-ripple${isSubmitting ? ' btn-loading' : ''}`}
               style={{
                 width: '100%',
                 padding: '0.85rem',
@@ -202,7 +217,9 @@ export default function Login({ earnXP }) {
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: '10px',
-                background: 'linear-gradient(135deg, #00c8ff 0%, #39ff14 100%)',
+                background: isSubmitting
+                  ? 'linear-gradient(135deg, #00a0cc 0%, #2acc10 100%)'
+                  : 'linear-gradient(135deg, #00c8ff 0%, #39ff14 100%)',
                 border: 'none',
                 borderRadius: '10px',
                 color: '#030813',
@@ -210,13 +227,19 @@ export default function Login({ earnXP }) {
                 fontSize: '0.95rem',
                 fontFamily: 'var(--font-mono)',
                 cursor: isSubmitting ? 'not-allowed' : 'pointer',
-                boxShadow: '0 4px 24px rgba(0,240,255,0.35)',
+                boxShadow: isSubmitting ? 'none' : '0 4px 24px rgba(0,240,255,0.35)',
                 transition: 'all 0.25s',
                 letterSpacing: '0.05em',
-                opacity: isSubmitting ? 0.6 : 1,
               }}
             >
-              Verify Handshake <ArrowRight size={17} />
+              {isSubmitting ? (
+                <>
+                  <span className="btn-spinner" style={{ borderTopColor: '#030813' }} />
+                  Authenticating...
+                </>
+              ) : (
+                <>Verify Handshake <ArrowRight size={17} /></>
+              )}
             </button>
           </form>
 
