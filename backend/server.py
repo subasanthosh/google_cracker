@@ -4,6 +4,7 @@ from fastapi import FastAPI,Body
 from fastapi import FastAPI,HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
+from argon2.exceptions import VerifyMismatchError
 from dotenv import load_dotenv  
 import os
 # pyrefly: ignore [missing-import]
@@ -63,9 +64,18 @@ async def login(data: dict):
             detail = "User Not Found"
     )
     else:
-        if PasswordHasher().verify(user["password"], data["password"]):
-            
+        print(user["password"])
+        try:
+            ph = PasswordHasher()
+            ph.verify(user["password"], data["password"])
             return {"message": "Login successful"}
+
+        except VerifyMismatchError:
+            
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid password"
+            )
 
 
 
