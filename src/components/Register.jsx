@@ -86,6 +86,9 @@ export default function Register({ earnXP }) {
         setIsSubmitting(false);
         return;
       }
+      else {
+        localStorage.setItem("email",handle);
+      }
 
       /* ── Success: animate terminal logs then show key ── */
       const candidateHandle = handle.startsWith('@') ? handle : `@${handle}`;
@@ -107,7 +110,7 @@ export default function Register({ earnXP }) {
               setGeneratedKey(mockKey);
               setIsSubmitting(false);
               earnXP(50, 'Cohort Enrollment Keys Generated');
-              setTimeout(() => navigate('/'), 2500);
+              setTimeout(() => navigate('/how-it-works'), 2500);
             }, 600);
           }
         }, (index + 1) * 350);
@@ -147,10 +150,10 @@ export default function Register({ earnXP }) {
 
           {/* ── Heading ── */}
           <h2 style={{ fontFamily: 'var(--font-mono)', color: '#ffffff', fontSize: '1.85rem', marginBottom: '0.4rem', textAlign: 'center', textShadow: '0 0 20px rgba(57,255,20,0.45)' }}>
-            Cohort Registration
+            Cohort Registration 
           </h2>
           <p style={{ color: 'rgba(160, 240, 180, 0.70)', fontSize: '0.88rem', textAlign: 'center', marginBottom: '1.75rem' }}>
-            Initialize your candidate entry to generate secure access keys.
+            Let's Do It Together.
           </p>
 
           {!generatedKey ? (
@@ -158,7 +161,7 @@ export default function Register({ earnXP }) {
 
               {/* Full Name */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
-                <label style={dark.label}>FULL_NAME</label>
+                <label style={dark.label}>FULL NAME</label>
                 <div style={{ position: 'relative' }}>
                   <User size={17} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(57,255,20,0.55)', pointerEvents: 'none' }} />
                   <input
@@ -196,7 +199,7 @@ export default function Register({ earnXP }) {
 
               {/* GitHub */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
-                <label style={dark.label}>GITHUB_PROFILE_URL</label>
+                <label style={dark.label}>GITHUB PROFILE URL</label>
                 <div style={{ position: 'relative' }}>
                   <GitBranch size={17} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(57,255,20,0.55)', pointerEvents: 'none' }} />
                   <input
@@ -215,7 +218,7 @@ export default function Register({ earnXP }) {
 
               {/* Password */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
-                <label style={dark.label}>CREATE_ACCESS_PASSWORD</label>
+                <label style={dark.label}>CREATE ACCESS PASSWORD</label>
                 <div style={{ position: 'relative' }}>
                   <Lock size={17} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(57,255,20,0.55)', pointerEvents: 'none' }} />
                   <input
@@ -287,10 +290,10 @@ export default function Register({ earnXP }) {
                 {isSubmitting ? (
                   <>
                     <span className="btn-spinner" style={{ borderTopColor: '#030813' }} />
-                    Generating Keys...
+                    Submit Application...
                   </>
                 ) : (
-                  <>Generate Access Keys <ArrowRight size={17} /></>
+                  <>Submit Application <ArrowRight size={17} /></>
                 )}
               </button>
 
@@ -326,7 +329,7 @@ export default function Register({ earnXP }) {
                 to="/login"
                 style={{ color: '#39ff14', fontSize: '0.84rem', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '5px', marginTop: '0.5rem', fontFamily: 'var(--font-mono)', textShadow: '0 0 8px rgba(57,255,20,0.45)' }}
               >
-                Verify Access Key (Login) →
+                Already A Member ? (Login) →
               </Link>
             </div>
           )}

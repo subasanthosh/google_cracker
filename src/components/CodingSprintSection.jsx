@@ -1,50 +1,83 @@
-import React, { useState, useEffect } from 'react';
-import { Zap, Code2, MessageSquare, Trophy, FileCode, Copy, CheckCircle, Clock, Play } from 'lucide-react';
-import { codeSnippets } from '../constants';
+import React, { useEffect, useState } from 'react';
+import { Code2, Trophy, Plus, X } from 'lucide-react';
 import bgImage3 from '../assets/google_workspace_bright.png';
-
 
 export default function CodingSprintSection() {
   const [activeTab, setActiveTab] = useState("daily");
-  const [lang, setLang] = useState("python");
-  const [isCopied, setIsCopied] = useState(false);
-  const [contestCountdown, setContestCountdown] = useState("00d : 00h : 00m : 00s");
+  
+  // Daily Questions State
+  const [isDailyModalOpen, setIsDailyModalOpen] = useState(false);
+  const [questionTitle, setQuestionTitle] = useState("");
+  const [questionLink, setQuestionLink] = useState("");
+  const [questions, setQuestions] = useState([]);
 
+  // Weekly Assessment State
+  const [isWeeklyModalOpen, setIsWeeklyModalOpen] = useState(false);
+  const [assessmentTitle, setAssessmentTitle] = useState("");
+  const [assessmentLink, setAssessmentLink] = useState("");
+  const [assessments, setAssessments] = useState([]);
+  const [role,setRole] = useState("");
   useEffect(() => {
-    const timer = setInterval(() => {
-      const now = new Date();
-      const nextContest = new Date();
-      nextContest.setDate(now.getDate() + (6 - now.getDay() + 7) % 7);
-      nextContest.setHours(14, 0, 0, 0);
-      
-      if (now > nextContest) {
-        nextContest.setDate(nextContest.getDate() + 7);
-      }
+  const fetchRole = async () => {
+    try {
+      const email = localStorage.getItem("email") || "";
+      console.log(email)
+      const res = await fetch(
+        `http://localhost:8000/getrole?email=${encodeURIComponent(email)}`,
+        {
+          method: "GET",
+        }
+      );
 
-      const diff = nextContest - now;
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      const secs = Math.floor((diff % (1000 * 60)) / 1000);
-      
-      setContestCountdown(`${String(days).padStart(2, '0')}d : ${String(hours).padStart(2, '0')}h : ${String(mins).padStart(2, '0')}m : ${String(secs).padStart(2, '0')}s`);
-    }, 1000);
-    return () => clearInterval(timer);
-  }, []);
+      const data = await res.json();
+      console.log(data.role)
+      setRole(data.role);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-  const handleCopyCode = () => {
-    navigator.clipboard.writeText(codeSnippets[lang]).then(() => {
-      setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 1500);
-    });
+  fetchRole();
+}, []);
+
+  const handleAddQuestion = (e) => {
+    e.preventDefault();
+    if (!questionTitle.trim() || !questionLink.trim()) return;
+
+    const newQuestion = {
+      id: Date.now(),
+      title: questionTitle.trim(),
+      link: questionLink.trim()
+    };
+
+    setQuestions([...questions, newQuestion]);
+    setQuestionTitle("");
+    setQuestionLink("");
+    setIsDailyModalOpen(false);
+  };
+
+  const handleAddAssessment = (e) => {
+    e.preventDefault();
+    if (!assessmentTitle.trim() || !assessmentLink.trim()) return;
+
+    const newAssessment = {
+      id: Date.now(),
+      title: assessmentTitle.trim(),
+      link: assessmentLink.trim()
+    };
+
+    setAssessments([...assessments, newAssessment]);
+    setAssessmentTitle("");
+    setAssessmentLink("");
+    setIsWeeklyModalOpen(false);
   };
 
   return (
-    <section className="coding-sprint-section" id="coding-sprint" style={{ backgroundImage: `linear-gradient(rgba(3, 5, 9, 0.5), rgba(3, 5, 9, 0.75)), url(${bgImage3})`, backgroundSize: 'cover', backgroundAttachment: 'fixed', padding: '6rem 0' }}>
+    <section className="coding-sprint-section" id="coding-sprint" style={{ backgroundImage: `linear-gradient(rgba(3, 5, 9, 0.45), rgba(3, 5, 9, 0.60)), url(${bgImage3})`, backgroundSize: 'cover', backgroundAttachment: 'fixed', padding: '6rem 0' }}>
       <div className="container">
         <div className="section-header text-center">
           <h2 className="section-title">Coding Sprints</h2>
-          <p className="section-subtitle text-muted">Sharpen your logic, write high-performance solutions, and climb the scoreboard.</p>
+          <p className="section-subtitle" style={{ color: '#ffffff' }}>Sharpen your logic, write high-performance solutions, and climb the scoreboard.</p>
         </div>
 
         <div className="tabs-container">
@@ -64,69 +97,409 @@ export default function CodingSprintSection() {
           </div>
 
           {/* Tab 1: Daily Sprint */}
-          <div className={`tab-content ${activeTab === 'daily' ? 'active' : ''}`} id="tab-daily">
-            <div className="sprint-grid">
-              <div className="challenge-info glass-card">
-                <div className="challenge-meta">
-                  <span className="difficulty hard">Hard</span>
-                  <span className="xp-bounty"><Zap size={14} style={{ marginRight: '4px' }} /> 300 XP</span>
-                </div>
-                <h3>LeetCode #239: Sliding Window Maximum</h3>
-                <p>You are given an array of integers <code>nums</code>, there is a sliding window of size <code>k</code> which is moving from the very left of the array to the very right. You can only see the <code>k</code> numbers in the window. Each time the sliding window moves right by one position.</p>
-                <p>Return the max sliding window.</p>
+          {activeTab === 'daily' && (
+            <div className="tab-content active" id="tab-daily">
+              <div style={{ maxWidth: '700px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
                 
-                <div className="code-picker-wrapper">
-                  <label className="mono-font">Select Language:</label>
-                  <select id="lang-picker" value={lang} onChange={(e) => setLang(e.target.value)}>
-                    <option value="python">Python</option>
-                    <option value="javascript">JavaScript</option>
-                    <option value="cpp">C++</option>
-                  </select>
+                {/* Header with ADD QUESTIONS Button */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <h3 style={{ color: '#fff', margin: 0 }}>Daily Questions</h3>
+                  { role === 'admin' && <button
+                    className="btn btn-primary"
+                    onClick={() => setIsDailyModalOpen(true)}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      padding: '0.6rem 1.2rem',
+                      fontWeight: 'bold',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <Plus size={18} /> ADD QUESTIONS
+                  </button>}
                 </div>
-              </div>
 
-              <div className="solution-showcase glass-card">
-                <div className="showcase-header">
-                  <span className="file-name"><FileCode size={14} style={{ marginRight: '6px' }} /> solution.{lang === 'python' ? 'py' : lang === 'javascript' ? 'js' : 'cpp'}</span>
-                  <button className="copy-btn" id="copy-code-btn" onClick={handleCopyCode}>
-                    <Copy size={12} style={{ marginRight: '4px' }} /> {isCopied ? "Copied" : "Copy"}
-                  </button>
+                {/* Added Questions Display List */}
+                <div className="glass-card" style={{ padding: '2rem' }}>
+                  {questions.length === 0 ? (
+                    <p className="text-muted" style={{ fontStyle: 'italic', textAlign: 'center', margin: 0 }}>No questions added yet. Click "ADD QUESTIONS" to add your first question.</p>
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                      {questions.map((q, idx) => (
+                        <div
+                          key={q.id}
+                          style={{
+                            padding: '1rem 1.25rem',
+                            borderRadius: '8px',
+                            background: 'rgba(15, 23, 42, 0.6)',
+                            border: '1px solid rgba(255, 255, 255, 0.1)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            gap: '1rem'
+                          }}
+                        >
+                          <div style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            <span style={{ color: '#4285F4', fontWeight: 'bold', marginRight: '0.5rem' }}>#{idx + 1}</span>
+                            <span style={{ color: '#fff', fontWeight: '600', fontSize: '1.1rem' }}>{q.title}</span>
+                          </div>
+                          <a
+                            href={q.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn btn-primary"
+                            style={{
+                              padding: '0.4rem 1rem',
+                              fontSize: '0.875rem',
+                              whiteSpace: 'nowrap',
+                              textDecoration: 'none'
+                            }}
+                          >
+                            Solve Problem
+                          </a>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-                <pre className="code-snippet-box">
-                  <code id="code-snippet-code">{codeSnippets[lang]}</code>
-                </pre>
+
               </div>
             </div>
-          </div>
+          )}
 
           {/* Tab 2: Weekly Sprint */}
-          <div className={`tab-content ${activeTab === 'weekly' ? 'active' : ''}`} id="tab-weekly">
-            <div className="contest-grid">
-              <div className="contest-info glass-card border-glow-blue">
-                <span className="badge-sprint">LIVE MATCHUP</span>
-                <h3>Weekly Coding Sprint</h3>
-                <p>Weekly algorithm races happen live every Saturday. Compete against peers in a race to optimize time complexities. Leaderboard calculations update instantly with penalty times.</p>
-                <div className="countdown-timer-box">
-                  <span className="countdown-label">NEXT LIVE CONTEST IN:</span>
-                  <div className="timer-display" id="contest-countdown">
-                    {contestCountdown}
-                  </div>
+          {activeTab === 'weekly' && (
+            <div className="tab-content active" id="tab-weekly">
+              <div style={{ maxWidth: '700px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                
+                {/* Header with ADD ASSESSMENT Button */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <h3 style={{ color: '#fff', margin: 0 }}>Weekly Assessments</h3>
+                  { role === 'admin' && <button
+                    className="btn btn-primary"
+                    onClick={() => setIsWeeklyModalOpen(true)}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      padding: '0.6rem 1.2rem',
+                      fontWeight: 'bold',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <Plus size={18} /> ADD ASSESSMENT
+                  </button>}
                 </div>
-                <button className="btn btn-primary w-full"><Play size={16} style={{ marginRight: '6px' }} /> Register for Contest</button>
-              </div>
-              <div className="contest-rules glass-card">
-                <h3>Sprint Rules</h3>
-                <ul className="checklist-list">
-                  <li><CheckCircle size={16} className="text-neon-green" style={{ marginRight: '8px' }} /> 3 Core problems: Easy, Medium, Hard.</li>
-                  <li><CheckCircle size={16} className="text-neon-green" style={{ marginRight: '8px' }} /> Plagiarism detection strictly enforced.</li>
-                  <li><CheckCircle size={16} className="text-neon-green" style={{ marginRight: '8px' }} /> Submission penalties of +10 mins for compile/runtime errors.</li>
-                  <li><CheckCircle size={16} className="text-neon-green" style={{ marginRight: '8px' }} /> Leaderboard unlocks +500 XP bonus for top 3 finishers.</li>
-                </ul>
+
+                {/* Added Assessments Display List */}
+                <div className="glass-card" style={{ padding: '2rem' }}>
+                  {assessments.length === 0 ? (
+                    <p className="text-muted" style={{ fontStyle: 'italic', textAlign: 'center', margin: 0 }}>No assessments added yet. Click "ADD ASSESSMENT" to add your first assessment.</p>
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                      {assessments.map((a, idx) => (
+                        <div
+                          key={a.id}
+                          style={{
+                            padding: '1rem 1.25rem',
+                            borderRadius: '8px',
+                            background: 'rgba(15, 23, 42, 0.6)',
+                            border: '1px solid rgba(255, 255, 255, 0.1)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            gap: '1rem'
+                          }}
+                        >
+                          <div style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                            <span style={{ color: '#FBBC05', fontWeight: 'bold', marginRight: '0.5rem' }}>#{idx + 1}</span>
+                            <span style={{ color: '#fff', fontWeight: '600', fontSize: '1.1rem' }}>{a.title}</span>
+                          </div>
+                          <a
+                            href={a.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="btn btn-primary"
+                            style={{
+                              padding: '0.4rem 1rem',
+                              fontSize: '0.875rem',
+                              whiteSpace: 'nowrap',
+                              textDecoration: 'none'
+                            }}
+                          >
+                            Start Assessment
+                          </a>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
               </div>
             </div>
-          </div>
+          )}
+
         </div>
       </div>
+
+      {/* Modal Overlay for Adding Daily Question */}
+      {isDailyModalOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: 'rgba(0, 0, 0, 0.75)',
+            backdropFilter: 'blur(5px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '1rem'
+          }}
+          onClick={() => setIsDailyModalOpen(false)}
+        >
+          <div
+            className="glass-card"
+            style={{
+              maxWidth: '500px',
+              width: '100%',
+              padding: '2.5rem',
+              position: 'relative',
+              boxShadow: '0 20px 50px rgba(0, 0, 0, 0.5)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setIsDailyModalOpen(false)}
+              style={{
+                position: 'absolute',
+                top: '1rem',
+                right: '1rem',
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--text-muted)',
+                cursor: 'pointer',
+                padding: '0.25rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              <X size={20} />
+            </button>
+
+           { role==='admin' && <h3 style={{ marginBottom: '1.5rem', color: '#fff', textAlign: 'center' }}>ADD QUESTION</h3>}
+
+            <form onSubmit={handleAddQuestion} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <label htmlFor="question-title" style={{ color: '#fff', fontWeight: '600' }}>Title</label>
+                <input
+                  id="question-title"
+                  type="text"
+                  placeholder="Enter question title"
+                  value={questionTitle}
+                  onChange={(e) => setQuestionTitle(e.target.value)}
+                  required
+                  style={{
+                    padding: '0.75rem 1rem',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    background: 'rgba(15, 23, 42, 0.6)',
+                    color: '#fff',
+                    fontSize: '1rem',
+                    outline: 'none'
+                  }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <label htmlFor="question-link" style={{ color: '#fff', fontWeight: '600' }}>Link</label>
+                <input
+                  id="question-link"
+                  type="url"
+                  placeholder="Enter question link"
+                  value={questionLink}
+                  onChange={(e) => setQuestionLink(e.target.value)}
+                  required
+                  style={{
+                    padding: '0.75rem 1rem',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    background: 'rgba(15, 23, 42, 0.6)',
+                    color: '#fff',
+                    fontSize: '1rem',
+                    outline: 'none'
+                  }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+                <button
+                  type="button"
+                  onClick={() => setIsDailyModalOpen(false)}
+                  style={{
+                    flex: 1,
+                    padding: '0.75rem 1rem',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    background: 'transparent',
+                    color: '#fff',
+                    fontWeight: 'bold',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  style={{
+                    flex: 1,
+                    padding: '0.75rem 1rem',
+                    fontWeight: 'bold',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Add Question
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Overlay for Adding Weekly Assessment */}
+      {isWeeklyModalOpen && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            backgroundColor: 'rgba(0, 0, 0, 0.75)',
+            backdropFilter: 'blur(5px)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 1000,
+            padding: '1rem'
+          }}
+          onClick={() => setIsWeeklyModalOpen(false)}
+        >
+          <div
+            className="glass-card"
+            style={{
+              maxWidth: '500px',
+              width: '100%',
+              padding: '2.5rem',
+              position: 'relative',
+              boxShadow: '0 20px 50px rgba(0, 0, 0, 0.5)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setIsWeeklyModalOpen(false)}
+              style={{
+                position: 'absolute',
+                top: '1rem',
+                right: '1rem',
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--text-muted)',
+                cursor: 'pointer',
+                padding: '0.25rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              <X size={20} />
+            </button>
+
+            <h3 style={{ marginBottom: '1.5rem', color: '#fff', textAlign: 'center' }}>ADD ASSESSMENT</h3>
+
+            <form onSubmit={handleAddAssessment} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <label htmlFor="assessment-title" style={{ color: '#fff', fontWeight: '600' }}>Title</label>
+                <input
+                  id="assessment-title"
+                  type="text"
+                  placeholder="Enter assessment title"
+                  value={assessmentTitle}
+                  onChange={(e) => setAssessmentTitle(e.target.value)}
+                  required
+                  style={{
+                    padding: '0.75rem 1rem',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    background: 'rgba(15, 23, 42, 0.6)',
+                    color: '#fff',
+                    fontSize: '1rem',
+                    outline: 'none'
+                  }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <label htmlFor="assessment-link" style={{ color: '#fff', fontWeight: '600' }}>Link</label>
+                <input
+                  id="assessment-link"
+                  type="url"
+                  placeholder="Enter assessment link"
+                  value={assessmentLink}
+                  onChange={(e) => setAssessmentLink(e.target.value)}
+                  required
+                  style={{
+                    padding: '0.75rem 1rem',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    background: 'rgba(15, 23, 42, 0.6)',
+                    color: '#fff',
+                    fontSize: '1rem',
+                    outline: 'none'
+                  }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+                <button
+                  type="button"
+                  onClick={() => setIsWeeklyModalOpen(false)}
+                  style={{
+                    flex: 1,
+                    padding: '0.75rem 1rem',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    background: 'transparent',
+                    color: '#fff',
+                    fontWeight: 'bold',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  style={{
+                    flex: 1,
+                    padding: '0.75rem 1rem',
+                    fontWeight: 'bold',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Add Assessment
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

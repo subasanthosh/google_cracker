@@ -8,13 +8,16 @@ export default function HeroSection({
   terminalInValue, setTerminalInValue, terminalOutLines, handleTerminalSubmit, terminalInputRef
 }) {
   return (
-    <section className="hero-section" id="hero" style={{
-      backgroundImage: `linear-gradient(rgba(3, 5, 9, 0.5), rgba(3, 5, 9, 0.75)), url(${googleWorkspaceBright})`,
+    <div className="hero-section" id="hero" style={{
+      backgroundImage: `linear-gradient(rgba(3, 5, 9, 0.45), rgba(3, 5, 9, 0.60)), url(${googleWorkspaceBright})`,
       backgroundSize: 'cover',
       backgroundPosition: 'center',
-      borderBottom: '1px solid var(--border-color)',
-      paddingTop: '6rem',
-      paddingBottom: '6rem'
+      backgroundAttachment: 'fixed',
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      paddingTop: '80px',
+      position: 'relative'
     }}>
       <div className="container hero-grid">
         <div className="hero-content">
@@ -132,6 +135,6 @@ export default function HeroSection({
           </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 }

@@ -80,6 +80,9 @@ export default function Login({ earnXP }) {
         setIsSubmitting(false);
         return;
       }
+      else {
+        localStorage.setItem("email",handle);
+      } 
 
       /* ── Success flow ── */
       const logs = [
@@ -96,7 +99,7 @@ export default function Login({ earnXP }) {
             setTimeout(() => {
               setIsSubmitting(false);
               earnXP(20, 'Console Access Authenticated');
-              navigate('/');
+              navigate('/sprint');
             }, 800);
           }
         }, (index + 1) * 400);

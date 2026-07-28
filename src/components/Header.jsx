@@ -57,16 +57,6 @@ export default function Header({ xp, level, levelTitle, streak, consoleGlitch, s
               <span className="xp-label">XP</span>
             </div>
 
-            {/* Theme toggle */}
-            <button
-              className="theme-toggle"
-              id="console-theme-btn"
-              title="Toggle Console Glitch Mode"
-              onClick={() => setConsoleGlitch(!consoleGlitch)}
-            >
-              {consoleGlitch ? <Monitor size={18} /> : <Terminal size={18} />}
-            </button>
-
             {/* ── Profile Avatar Button ── */}
             <div ref={profileRef} style={{ position: 'relative' }}>
               <button

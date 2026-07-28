@@ -11,7 +11,7 @@ export default function HowItWorksSection() {
       <div 
         className="google-hero"
         style={{
-          backgroundImage: `linear-gradient(rgba(3, 5, 9, 0.5), rgba(3, 5, 9, 0.75)), url(${googleBrightLobby})`,
+          backgroundImage: `linear-gradient(rgba(3, 5, 9, 0.45), rgba(3, 5, 9, 0.60)), url(${googleBrightLobby})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundAttachment: 'fixed',
@@ -122,7 +122,7 @@ export default function HowItWorksSection() {
       {/* Quote Section */}
       <div 
         style={{
-          backgroundImage: `linear-gradient(rgba(3, 5, 9, 0.55), rgba(3, 5, 9, 0.55)), url(${googleBrightExterior})`,
+          backgroundImage: `linear-gradient(rgba(3, 5, 9, 0.45), rgba(3, 5, 9, 0.60)), url(${googleBrightExterior})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundAttachment: 'fixed',
@@ -183,7 +183,7 @@ export default function HowItWorksSection() {
       {/* How Journey Works & XP */}
       <div 
         style={{
-          backgroundImage: `linear-gradient(rgba(3, 5, 9, 0.65), rgba(3, 5, 9, 0.65)), url(${googleBrightInterior})`,
+          backgroundImage: `linear-gradient(rgba(3, 5, 9, 0.45), rgba(3, 5, 9, 0.60)), url(${googleBrightInterior})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           padding: '6rem 0'
