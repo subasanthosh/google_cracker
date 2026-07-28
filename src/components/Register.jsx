@@ -73,6 +73,18 @@ export default function Register({ earnXP }) {
       body: JSON.stringify({ name, email: handle, github, password })
     });
 
+  await fetch("http://127.0.0.1:8000/registerinpage",{
+    headers:{"Content-Type": "application/json",},
+    method:"POST",
+    body:JSON.stringify({
+      name:name,
+      email:handle,
+      github:github,
+      password:password})
+  })
+
+  
+    
     setIsSubmitting(true);
     const candidateHandle = handle.startsWith('@') ? handle : `@${handle}`;
 

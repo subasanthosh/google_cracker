@@ -56,12 +56,21 @@ export default function Login({ earnXP }) {
   const [errorMsg, setErrorMsg] = useState('');
   const navigate = useNavigate();
 
-  const handleLoginSubmit = (e) => {
+  const handleLoginSubmit =async (e) => {
     e.preventDefault();
     if (!handle || !password) {
       setErrorMsg('CRITICAL_ERR: Missing authentication credentials.');
       return;
     }
+
+    await fetch("http://127.0.0.1:8000/logininpage", {
+      headers:{"Content-Type": "application/json"},
+      method:"POST",
+      body:JSON.stringify({
+        "email": handle,
+        "password": password
+      })
+    })
     setErrorMsg('');
     setIsSubmitting(true);
 
