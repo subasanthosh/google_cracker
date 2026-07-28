@@ -1,12 +1,20 @@
 import React from 'react';
 import { Activity } from 'lucide-react';
+import googleWorkspaceBright from '../assets/google_workspace_bright.png';
 
 export default function HeroSection({ 
   streak, xp, level, levelTitle, feedItems, setCurrentPage,
   terminalInValue, setTerminalInValue, terminalOutLines, handleTerminalSubmit, terminalInputRef
 }) {
   return (
-    <section className="hero-section" id="hero">
+    <section className="hero-section" id="hero" style={{
+      backgroundImage: `linear-gradient(rgba(3, 5, 9, 0.5), rgba(3, 5, 9, 0.75)), url(${googleWorkspaceBright})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      borderBottom: '1px solid var(--border-color)',
+      paddingTop: '6rem',
+      paddingBottom: '6rem'
+    }}>
       <div className="container hero-grid">
         <div className="hero-content">
           <div className="badge-accent">

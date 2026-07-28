@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Users, Zap, Shuffle, MessageSquare, CheckCircle2, Calendar } from 'lucide-react';
 import { buddyProfiles } from '../constants';
+import bgImage1 from '../assets/google_workspace_bright.png';
+
 
 export default function BuddySystemSection({ 
   earnXP, setStreak, scheduledSessions, setScheduledSessions, appendTerminalOutput 
@@ -52,7 +54,7 @@ export default function BuddySystemSection({
   const currentBuddy = buddyProfiles[activeBuddyIndex];
 
   return (
-    <section className="buddy-system-section" id="buddy-system">
+    <section className="buddy-system-section" id="buddy-system" style={{ backgroundImage: `linear-gradient(rgba(3, 5, 9, 0.5), rgba(3, 5, 9, 0.75)), url(${bgImage1})`, backgroundSize: 'cover', backgroundAttachment: 'fixed', padding: '6rem 0' }}>
       <div className="container">
         <div className="section-header text-center">
           <h2 className="section-title">The Buddy Synergy Engine</h2>

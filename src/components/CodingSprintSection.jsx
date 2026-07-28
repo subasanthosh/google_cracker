@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Zap, Code2, MessageSquare, Trophy, FileCode, Copy, CheckCircle, Clock, Play } from 'lucide-react';
 import { codeSnippets } from '../constants';
+import bgImage3 from '../assets/google_workspace_bright.png';
+
 
 export default function CodingSprintSection() {
   const [activeTab, setActiveTab] = useState("daily");
@@ -38,7 +40,7 @@ export default function CodingSprintSection() {
   };
 
   return (
-    <section className="coding-sprint-section" id="coding-sprint">
+    <section className="coding-sprint-section" id="coding-sprint" style={{ backgroundImage: `linear-gradient(rgba(3, 5, 9, 0.5), rgba(3, 5, 9, 0.75)), url(${bgImage3})`, backgroundSize: 'cover', backgroundAttachment: 'fixed', padding: '6rem 0' }}>
       <div className="container">
         <div className="section-header text-center">
           <h2 className="section-title">Coding Sprints</h2>

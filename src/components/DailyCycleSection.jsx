@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cycleSteps } from '../constants';
+import bgImage6 from '../assets/google_cafeteria_bright.png';
+
 
 export default function DailyCycleSection() {
   const [currentCycleStep, setCurrentCycleStep] = useState(0);
@@ -8,7 +10,7 @@ export default function DailyCycleSection() {
   const activeStep = cycleSteps[currentCycleStep];
 
   return (
-    <section className="daily-cycle-section" id="daily-cycle">
+    <section className="daily-cycle-section" id="daily-cycle" style={{ backgroundImage: `linear-gradient(rgba(3, 5, 9, 0.5), rgba(3, 5, 9, 0.75)), url(${bgImage6})`, backgroundSize: 'cover', backgroundAttachment: 'fixed', padding: '6rem 0' }}>
       <div className="container">
         <div className="section-header text-center">
           <h2 className="section-title">The Velocity Daily Cycle</h2>

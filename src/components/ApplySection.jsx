@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Rocket, CheckCircle2 } from 'lucide-react';
+import bgImage0 from '../assets/google_cafeteria_bright.png';
+
 
 export default function ApplySection() {
   const [appName, setAppName] = useState("");
@@ -15,7 +17,7 @@ export default function ApplySection() {
   };
 
   return (
-    <section className="apply-section" id="apply-now">
+    <section className="apply-section" id="apply-now" style={{ backgroundImage: `linear-gradient(rgba(3, 5, 9, 0.5), rgba(3, 5, 9, 0.75)), url(${bgImage0})`, backgroundSize: 'cover', backgroundAttachment: 'fixed', padding: '6rem 0' }}>
       <div className="container text-center max-w-md">
         <div className="badge-accent margin-auto">
           <span className="pulse-dot"></span> APPLICATIONS ARE NOW OPEN

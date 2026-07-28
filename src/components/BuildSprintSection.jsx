@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Share2 } from 'lucide-react';
+import bgImage4 from '../assets/google_cafeteria_bright.png';
+
 
 export default function BuildSprintSection() {
   const [hackathonTimer, setHackathonTimer] = useState("48:00:00");
@@ -25,7 +27,7 @@ export default function BuildSprintSection() {
   }, []);
 
   return (
-    <section className="build-sprint-section" id="build-sprint">
+    <section className="build-sprint-section" id="build-sprint" style={{ backgroundImage: `linear-gradient(rgba(3, 5, 9, 0.5), rgba(3, 5, 9, 0.75)), url(${bgImage4})`, backgroundSize: 'cover', backgroundAttachment: 'fixed', padding: '6rem 0' }}>
       <div className="container">
         <div className="section-header text-center">
           <h2 className="section-title">Build Sprint: Show Your Shipping Power</h2>

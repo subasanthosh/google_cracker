@@ -1,9 +1,11 @@
 import React from 'react';
 import { Zap, Check, Shield } from 'lucide-react';
+import bgImage2 from '../assets/google_cafeteria_bright.png';
+
 
 export default function WeeklySystemSection() {
   return (
-    <section className="weekly-system-section" id="weekly-system">
+    <section className="weekly-system-section" id="weekly-system" style={{ backgroundImage: `linear-gradient(rgba(3, 5, 9, 0.5), rgba(3, 5, 9, 0.75)), url(${bgImage2})`, backgroundSize: 'cover', backgroundAttachment: 'fixed', padding: '6rem 0' }}>
       <div className="container">
         <div className="section-header text-center">
           <h2 className="section-title">The 5+1+1 Weekly Cadence</h2>
