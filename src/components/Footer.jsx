@@ -7,7 +7,7 @@ export default function Footer() {
     <footer className="main-footer">
       <div className="container footer-grid">
         <div className="footer-brand">
-          <span className="footer-logo">&gt; VELOCITY_13</span>
+          <span className="footer-logo">&gt;GOOGLE COHORT(crack google interview)</span>
           <p>Developing unbreakable consistency and architectural strength over a 13-month developer run.</p>
           <div className="social-links">
             <a href="https://GitHub.com" target="_blank" rel="noreferrer" title="GitHub">GitHub</a>

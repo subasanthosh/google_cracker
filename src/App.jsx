@@ -226,7 +226,8 @@ export default function App() {
 
       {!isHome && !isApply && (
         <Header
-          xp={xp} consoleGlitch={consoleGlitch} setConsoleGlitch={setConsoleGlitch}
+          xp={xp} level={level} levelTitle={levelTitle} streak={streak}
+          consoleGlitch={consoleGlitch} setConsoleGlitch={setConsoleGlitch}
         />
       )}
 

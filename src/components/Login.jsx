@@ -2,6 +2,51 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Terminal, Lock, User, Eye, EyeOff, ShieldAlert, Key, ArrowRight } from 'lucide-react';
 
+/* ── Dark theme glassmorphism tokens ── */
+const dark = {
+  card: {
+    background: 'rgba(5, 8, 18, 0.88)',
+    backdropFilter: 'blur(28px)',
+    WebkitBackdropFilter: 'blur(28px)',
+    border: '1px solid rgba(0, 240, 255, 0.22)',
+    borderRadius: '20px',
+    boxShadow: '0 12px 48px rgba(0,0,0,0.60), 0 0 0 1px rgba(0,240,255,0.08), inset 0 1px 0 rgba(255,255,255,0.06)',
+    padding: '3rem',
+    position: 'relative',
+  },
+  input: {
+    width: '100%',
+    boxSizing: 'border-box',
+    padding: '0.8rem 1rem 0.8rem 2.6rem',
+    background: 'rgba(0, 240, 255, 0.05)',
+    border: '1px solid rgba(0, 240, 255, 0.18)',
+    borderRadius: '10px',
+    color: '#e8f8ff',
+    fontSize: '0.95rem',
+    outline: 'none',
+    transition: 'border-color 0.25s, box-shadow 0.25s',
+  },
+  inputPw: {
+    width: '100%',
+    boxSizing: 'border-box',
+    padding: '0.8rem 3rem 0.8rem 2.6rem',
+    background: 'rgba(0, 240, 255, 0.05)',
+    border: '1px solid rgba(0, 240, 255, 0.18)',
+    borderRadius: '10px',
+    color: '#e8f8ff',
+    fontSize: '0.95rem',
+    outline: 'none',
+    transition: 'border-color 0.25s, box-shadow 0.25s',
+  },
+  label: {
+    fontSize: '0.75rem',
+    fontWeight: '600',
+    letterSpacing: '0.10em',
+    color: '#00f0ff',
+    fontFamily: 'var(--font-mono)',
+  },
+};
+
 export default function Login({ earnXP }) {
   const [handle, setHandle] = useState('');
   const [password, setPassword] = useState('');
@@ -19,8 +64,7 @@ export default function Login({ earnXP }) {
     }
     setErrorMsg('');
     setIsSubmitting(true);
-    
-    // Simulate terminal logging for authenticating
+
     const logs = [
       `Initializing authentication handshake...`,
       `Verifying candidate handle: ${handle}...`,
@@ -42,135 +86,145 @@ export default function Login({ earnXP }) {
     });
   };
 
+  const onFocusBlue = (e) => { e.target.style.borderColor = '#00f0ff'; e.target.style.boxShadow = '0 0 0 3px rgba(0,240,255,0.14)'; };
+  const onBlurBlue  = (e) => { e.target.style.borderColor = 'rgba(0,240,255,0.18)'; e.target.style.boxShadow = 'none'; };
+
   return (
-    <section className="login-section" style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '4rem 0' }}>
-      <div className="container" style={{ maxWidth: '480px' }}>
-        <div className="glass-card border-glow-blue" style={{ padding: '3rem', position: 'relative' }}>
-          
-          {/* Cyber Terminal Top Header */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(0, 240, 255, 0.15)', paddingBottom: '1rem', marginBottom: '2rem' }}>
-            <span className="mono-font" style={{ color: 'var(--color-electric-blue)', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+    <div style={{
+      minHeight: '100vh',
+      backgroundImage: 'url(/google_campus_bg.png)',
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundAttachment: 'fixed',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '2rem',
+    }}>
+      <div style={{ width: '100%', maxWidth: '460px' }}>
+        <div style={dark.card}>
+
+          {/* ── Top bar ── */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '1rem', marginBottom: '1.75rem', borderBottom: '1px solid rgba(0,240,255,0.15)' }}>
+            <span style={{ ...dark.label, display: 'flex', alignItems: 'center', gap: '6px' }}>
               <Terminal size={14} /> SECURE_AUTHENTICATION.exe
             </span>
-            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--color-neon-green)' }}></span>
+            <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#39ff14', boxShadow: '0 0 8px #39ff14' }} />
           </div>
 
-          <h2 className="mono-font text-center" style={{ color: '#fff', fontSize: '1.8rem', marginBottom: '0.5rem', textShadow: 'var(--glow-text)' }}>
+          {/* ── Heading ── */}
+          <h2 style={{ fontFamily: 'var(--font-mono)', color: '#ffffff', fontSize: '1.85rem', marginBottom: '0.4rem', textAlign: 'center', textShadow: '0 0 20px rgba(0,240,255,0.5)' }}>
             Candidate Login
           </h2>
-          <p className="text-muted text-center" style={{ fontSize: '0.9rem', marginBottom: '2rem' }}>
-            Enter your cohort keys to establish system connection.P
+          <p style={{ color: 'rgba(160, 210, 230, 0.75)', fontSize: '0.88rem', textAlign: 'center', marginBottom: '2rem' }}>
+            Enter your cohort keys to establish system connection.
           </p>
 
-          <form onSubmit={handleLoginSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            
-            {/* Handle/Email Input */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <label className="mono-font" style={{ fontSize: '0.85rem', color: 'var(--color-electric-blue)' }}>EMAIL</label>
+          <form onSubmit={handleLoginSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.4rem' }}>
+
+            {/* Email */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+              <label style={dark.label}>EMAIL</label>
               <div style={{ position: 'relative' }}>
-                <User size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255, 255, 255, 0.3)' }} />
-                <input 
-                  type="text" 
+                <User size={17} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(0,240,255,0.5)', pointerEvents: 'none' }} />
+                <input
+                  type="text"
                   value={handle}
                   onChange={(e) => setHandle(e.target.value)}
-                  placeholder="@console_lord"
-                  style={{
-                    width: '90%',
-                    padding: '0.75rem 1rem 0.75rem 2.5rem',
-                    background: 'rgba(3, 5, 9, 0.6)',
-                    border: '1px solid rgba(0, 240, 255, 0.2)',
-                    borderRadius: '8px',
-                    color: '#fff',
-                    fontFamily: 'var(--font-sans)',
-                    fontSize: '0.95rem',
-                    outline: 'none',
-                    transition: 'all 0.3s'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = 'var(--color-electric-blue)'}
-                  onBlur={(e) => e.target.style.borderColor = 'rgba(0, 240, 255, 0.2)'}
+                  placeholder="you@email.com"
+                  style={dark.input}
+                  onFocus={onFocusBlue}
+                  onBlur={onBlurBlue}
                   disabled={isSubmitting}
                 />
               </div>
             </div>
 
-            {/* Password Input */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <label className="mono-font" style={{ fontSize: '0.85rem', color: 'var(--color-electric-blue)' }}>PASSWORD</label>
+            {/* Password */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+              <label style={dark.label}>PASSWORD</label>
               <div style={{ position: 'relative' }}>
-                <Lock size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(255, 255, 255, 0.3)' }} />
-                <input 
-                  type={showPassword ? "text" : "password"} 
+                <Lock size={17} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'rgba(0,240,255,0.5)', pointerEvents: 'none' }} />
+                <input
+                  type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••"
-                  style={{
-                    width: '84%',
-                    padding: '0.75rem 2.5rem 0.75rem 2.5rem',
-                    background: 'rgba(3, 5, 9, 0.6)',
-                    border: '1px solid rgba(0, 240, 255, 0.2)',
-                    borderRadius: '8px',
-                    color: '#fff',
-                    fontSize: '0.95rem',
-                    outline: 'none',
-                    transition: 'all 0.3s'
-                  }}
-                  onFocus={(e) => e.target.style.borderColor = 'var(--color-electric-blue)'}
-                  onBlur={(e) => e.target.style.borderColor = 'rgba(0, 240, 255, 0.2)'}
+                  style={dark.inputPw}
+                  onFocus={onFocusBlue}
+                  onBlur={onBlurBlue}
                   disabled={isSubmitting}
                 />
-                <button 
+                <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255, 255, 255, 0.3)' }}
+                  style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(0,240,255,0.5)', padding: 0 }}
                 >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
                 </button>
               </div>
             </div>
 
-            {/* Error Message Box */}
+            {/* Error */}
             {errorMsg && (
-              <div className="mono-font" style={{ fontSize: '0.8rem', color: 'var(--color-crimson)', display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255, 0, 85, 0.05)', padding: '0.75rem 1rem', borderRadius: '6px', border: '1px solid rgba(255, 0, 85, 0.2)' }}>
-                <ShieldAlert size={16} /> {errorMsg}
+              <div style={{ fontSize: '0.8rem', color: '#ff4d6d', display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(255,0,85,0.10)', padding: '0.75rem 1rem', borderRadius: '8px', border: '1px solid rgba(255,0,85,0.28)' }}>
+                <ShieldAlert size={15} /> {errorMsg}
               </div>
             )}
 
-            {/* Console Log Animation Block */}
+            {/* Terminal logs */}
             {terminalLogs.length > 0 && (
-              <div className="mono-font" style={{ fontSize: '0.75rem', background: '#030509', border: '1px solid rgba(0, 240, 255, 0.1)', padding: '1rem', borderRadius: '6px', color: 'var(--color-electric-blue)', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <div style={{ fontSize: '0.74rem', background: 'rgba(0,0,0,0.55)', border: '1px solid rgba(0,240,255,0.18)', padding: '0.9rem 1rem', borderRadius: '8px', color: '#00f0ff', display: 'flex', flexDirection: 'column', gap: '4px', fontFamily: 'var(--font-mono)' }}>
                 {terminalLogs.map((log, idx) => (
                   <div key={idx}>&gt; {log}</div>
                 ))}
               </div>
             )}
 
-            {/* Submit Button */}
-            <button 
-              type="submit" 
-              className="btn btn-primary"
+            {/* Submit */}
+            <button
+              type="submit"
               disabled={isSubmitting}
-              style={{ width: '100%', marginTop: '0.5rem', display: 'flex', gap: '10px' }}
+              style={{
+                width: '100%',
+                padding: '0.85rem',
+                marginTop: '0.25rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '10px',
+                background: 'linear-gradient(135deg, #00c8ff 0%, #39ff14 100%)',
+                border: 'none',
+                borderRadius: '10px',
+                color: '#030813',
+                fontWeight: '800',
+                fontSize: '0.95rem',
+                fontFamily: 'var(--font-mono)',
+                cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                boxShadow: '0 4px 24px rgba(0,240,255,0.35)',
+                transition: 'all 0.25s',
+                letterSpacing: '0.05em',
+                opacity: isSubmitting ? 0.6 : 1,
+              }}
             >
-              Verify Handshake <ArrowRight size={18} />
+              Verify Handshake <ArrowRight size={17} />
             </button>
-
           </form>
 
-          {/* Footer Link to Register */}
-          <div style={{ marginTop: '2rem', borderTop: '1px solid rgba(255, 255, 255, 0.05)', paddingTop: '1.5rem', textAlign: 'center' }}>
-            <span className="text-muted" style={{ fontSize: '0.85rem' }}>No cohort registration yet?</span>
+          {/* Footer */}
+          <div style={{ marginTop: '1.75rem', paddingTop: '1.5rem', textAlign: 'center', borderTop: '1px solid rgba(255,255,255,0.07)' }}>
+            <span style={{ fontSize: '0.84rem', color: 'rgba(160,200,220,0.60)' }}>No cohort registration yet?</span>
             <br />
-            <Link 
+            <Link
               to="/register"
-              className="mono-font"
-              style={{ color: 'var(--color-electric-blue)', fontSize: '0.85rem', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px', marginTop: '0.5rem' }}
+              style={{ color: '#00f0ff', fontSize: '0.84rem', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '5px', marginTop: '0.5rem', fontFamily: 'var(--font-mono)', textShadow: '0 0 8px rgba(0,240,255,0.45)' }}
             >
-              <Key size={14} /> Generate Access Key (Register)
+              <Key size={13} /> Generate Access Key (Register)
             </Link>
           </div>
 
         </div>
       </div>
-    </section>
+    </div>
   );
 }

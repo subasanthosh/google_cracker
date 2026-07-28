@@ -21,8 +21,23 @@ export default function HowItWorksSection() {
         }}
       >
         <div className="container" style={{ maxWidth: '900px', margin: '0 auto' }}>
-          <h1 style={{ fontSize: '3.5rem', marginBottom: '1.5rem', background: 'linear-gradient(90deg, #4285F4, #EA4335, #FBBC05, #34A853)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', fontWeight: 800 }}>
-            🚀 Welcome to the 13-Month Google Velocity Cohort
+          <h1 style={{
+            fontSize: '3.5rem',
+            marginBottom: '1.5rem',
+            background: 'linear-gradient(90deg, #4285F4, #EA4335, #FBBC05, #34A853)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            fontWeight: 800,
+            filter: 'drop-shadow(0 2px 12px rgba(0,0,0,0.85)) drop-shadow(0 0 24px rgba(0,0,0,0.7))',
+            padding: '0.5rem 1rem',
+            borderRadius: '12px',
+            background: 'linear-gradient(90deg, #4285F4, #EA4335, #FBBC05, #34A853)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            boxShadow: '0 4px 32px rgba(0,0,0,0.55)',
+          }}>
+           Welcome to the 13-Month Google Velocity Cohort
           </h1>
           <div className="glass-card" style={{ padding: '3rem', textAlign: 'left', marginTop: '3rem' }}>
             <div style={{
