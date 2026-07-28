@@ -73,7 +73,7 @@ export default function Register({ earnXP }) {
       body: JSON.stringify({ name, email: handle, github, password })
     });
 
-  await fetch("http://127.0.0.1:8000/registerinpage",{
+  const response = await fetch("http://127.0.0.1:8000/registerinpage",{
     headers:{"Content-Type": "application/json",},
     method:"POST",
     body:JSON.stringify({
@@ -83,6 +83,11 @@ export default function Register({ earnXP }) {
       password:password})
   })
 
+  const data = await response.json();
+  if(data.message === "User already exists"){
+    alert("Error: User already exists. Please login instead.");
+    return;
+  }
   
     
     setIsSubmitting(true);
