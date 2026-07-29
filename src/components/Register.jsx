@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Terminal, Lock, User, GitBranch, Eye, EyeOff, ShieldCheck, ArrowRight } from 'lucide-react';
+import ConnectGithub from './ConnectGithub';
 
 /* ── Light theme glassmorphism tokens (Realistic Glass) ── */
 const light = {
@@ -61,6 +62,7 @@ export default function Register({ earnXP }) {
   const [terminalLogs, setTerminalLogs] = useState([]);
   const [generatedKey, setGeneratedKey] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
+  const [showConnectOverlay, setShowConnectOverlay] = useState(false);
 
   // Enforce complete scroll lock on document body and html while route is active
   useEffect(() => {
@@ -90,7 +92,7 @@ export default function Register({ earnXP }) {
       const res = await fetch('http://127.0.0.1:8000/registerinpage', {
         headers: { 'Content-Type': 'application/json' },
         method: 'POST',
-        body: JSON.stringify({ name, email: handle, github, password }),
+        body: JSON.stringify({ name, email: handle, github_name: github, password }),
       });
 
       const data = await res.json();
@@ -101,7 +103,7 @@ export default function Register({ earnXP }) {
         return;
       }
       else {
-        localStorage.setItem("email",handle);
+        localStorage.setItem("email", handle);
       }
 
       /* ── Success: animate terminal logs then show key ── */
@@ -123,7 +125,9 @@ export default function Register({ earnXP }) {
               setGeneratedKey(mockKey);
               setIsSubmitting(false);
               earnXP(50, 'Cohort Enrollment Keys Generated');
-              setTimeout(() => navigate('/how-it-works'), 2500);
+              setTimeout(() => {
+                setShowConnectOverlay(true);
+              }, 2000);
             }, 600);
           }
         }, (index + 1) * 300);
@@ -136,7 +140,7 @@ export default function Register({ earnXP }) {
   };
 
   const onFocusGreen = (e) => { e.target.style.borderColor = '#16a34a'; e.target.style.boxShadow = '0 0 0 3px rgba(22, 163, 74, 0.15)'; };
-  const onBlurGreen  = (e) => { e.target.style.borderColor = 'rgba(255, 255, 255, 0.45)'; e.target.style.boxShadow = 'none'; };
+  const onBlurGreen = (e) => { e.target.style.borderColor = 'rgba(255, 255, 255, 0.45)'; e.target.style.boxShadow = 'none'; };
 
   return (
     <div className="raleway-theme" style={{
@@ -197,7 +201,7 @@ export default function Register({ earnXP }) {
 
           {/* ── Heading ── */}
           <h2 style={{ color: '#0f172a', fontSize: '1.35rem', marginBottom: '0.1rem', textAlign: 'center', fontWeight: 800 }}>
-            Cohort Registration 
+            Cohort Registration
           </h2>
           <p style={{ color: '#475569', fontSize: '0.78rem', textAlign: 'center', marginBottom: '0.85rem', fontWeight: 500 }}>
             Let's Do It Together.
@@ -251,14 +255,14 @@ export default function Register({ earnXP }) {
               <div style={{ display: 'flex', gap: '0.75rem' }}>
                 {/* GitHub */}
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                  <label style={light.label}>GITHUB PROFILE URL</label>
+                  <label style={light.label}>GITHUB USERNAME</label>
                   <div style={{ position: 'relative' }}>
                     <GitBranch size={15} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#15803d', pointerEvents: 'none' }} />
                     <input
-                      type="url"
+                      type="text"
                       value={github}
                       onChange={(e) => setGithub(e.target.value)}
-                      placeholder="https://github.com/..."
+                      placeholder="e.g. octocat"
                       required
                       style={light.input}
                       onFocus={onFocusGreen}
@@ -386,6 +390,7 @@ export default function Register({ earnXP }) {
 
         </div>
       </div>
+      {showConnectOverlay && <ConnectGithub />}
     </div>
   );
 }

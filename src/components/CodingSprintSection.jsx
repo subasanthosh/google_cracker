@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Code2, Trophy, Plus, X, Loader2, ExternalLink, Zap, Target } from 'lucide-react';
+import { Code2, Trophy, Plus, X, Loader2, ExternalLink, Zap, Target, Lock, CheckCircle, AlertCircle } from 'lucide-react';
 import bgImage3 from '../assets/google_workspace_bright.png';
 
 const STYLES = `
@@ -36,9 +36,9 @@ const STYLES = `
     gap: 0.5rem;
     padding: 0.75rem 1.75rem;
     border-radius: 50px;
-    border: 1.5px solid rgba(255,255,255,0.1);
+    border: 1.5px solid rgba(255,255,255,0.15);
     background: rgba(255,255,255,0.04);
-    color: rgba(255,255,255,0.55);
+    color: rgba(255,255,255,0.7);
     font-size: 0.95rem;
     font-weight: 600;
     font-family: 'Inter', sans-serif;
@@ -63,16 +63,16 @@ const STYLES = `
     animation: shimmer 1.2s ease-in-out;
   }
   .sprint-tab-btn:hover {
-    color: rgba(255,255,255,0.9);
-    border-color: rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.95);
+    border-color: rgba(255,255,255,0.3);
     background: rgba(255,255,255,0.08);
-    transform: translateY(-1px);
+    transform: translateY(-2px);
   }
   .sprint-tab-btn.active-daily {
-    background: linear-gradient(135deg, rgba(66,133,244,0.25) 0%, rgba(52,168,235,0.15) 100%);
-    border-color: rgba(66,133,244,0.6);
-    color: #6db3ff;
-    animation: pulse-glow 2.5s ease-in-out infinite;
+    background: linear-gradient(135deg, rgba(251,188,5,0.25) 0%, rgba(255,159,0,0.18) 100%);
+    border-color: rgba(251,188,5,0.65);
+    color: #ffd055;
+    animation: pulse-glow-gold 2.5s ease-in-out infinite;
   }
   .sprint-tab-btn.active-weekly {
     background: linear-gradient(135deg, rgba(251,188,5,0.2) 0%, rgba(255,159,0,0.12) 100%);
@@ -84,15 +84,15 @@ const STYLES = `
   .sprint-question-card {
     padding: 1.1rem 1.35rem;
     border-radius: 14px;
-    background: rgba(15, 23, 42, 0.5);
-    border: 1px solid rgba(255,255,255,0.07);
+    background: rgba(10, 16, 32, 0.7);
+    border: 1px solid rgba(255,255,255,0.08);
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 1rem;
     transition: all 0.3s ease;
     animation: slideIn 0.35s ease forwards;
-    backdrop-filter: blur(8px);
+    backdrop-filter: blur(12px);
     position: relative;
     overflow: hidden;
   }
@@ -104,16 +104,45 @@ const STYLES = `
     width: 3px;
     height: 100%;
     border-radius: 14px 0 0 14px;
-    background: linear-gradient(180deg, #4285F4, #34a8eb);
+    background: linear-gradient(180deg, #FBBC05, #ff9f00);
     opacity: 0.8;
   }
-  .sprint-question-card.weekly-card::before {
-    background: linear-gradient(180deg, #FBBC05, #ff9f00);
-  }
   .sprint-question-card:hover {
-    background: rgba(20, 30, 55, 0.7);
-    border-color: rgba(255,255,255,0.13);
+    background: rgba(15, 23, 42, 0.85);
+    border-color: rgba(255,255,255,0.15);
     transform: translateX(4px);
+  }
+  .sprint-question-card.locked::before {
+    background: linear-gradient(180deg, #64748b, #475569);
+  }
+
+  .sprint-verify-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 1.1rem;
+    border-radius: 30px;
+    border: 1.5px solid rgba(34,197,94,0.5);
+    background: linear-gradient(135deg, rgba(34,197,94,0.15), rgba(22,163,74,0.08));
+    color: #4ade80;
+    font-size: 0.82rem;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    white-space: nowrap;
+  }
+  .sprint-verify-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, rgba(34,197,94,0.3), rgba(22,163,74,0.18));
+    border-color: rgba(34,197,94,0.85);
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 18px rgba(34,197,94,0.22);
+  }
+  .sprint-verify-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 
   .sprint-solve-btn {
@@ -122,9 +151,9 @@ const STYLES = `
     gap: 0.4rem;
     padding: 0.45rem 1.1rem;
     border-radius: 30px;
-    border: 1.5px solid rgba(66,133,244,0.5);
-    background: linear-gradient(135deg, rgba(66,133,244,0.15), rgba(52,168,235,0.08));
-    color: #6db3ff;
+    border: 1.5px solid rgba(251,188,5,0.5);
+    background: linear-gradient(135deg, rgba(251,188,5,0.15), rgba(255,159,0,0.08));
+    color: #ffd055;
     font-size: 0.82rem;
     font-weight: 600;
     font-family: 'Inter', sans-serif;
@@ -135,11 +164,11 @@ const STYLES = `
     white-space: nowrap;
   }
   .sprint-solve-btn:hover {
-    background: linear-gradient(135deg, rgba(66,133,244,0.35), rgba(52,168,235,0.2));
-    border-color: rgba(66,133,244,0.8);
-    color: #a8d0ff;
+    background: linear-gradient(135deg, rgba(251,188,5,0.3), rgba(255,159,0,0.18));
+    border-color: rgba(251,188,5,0.85);
+    color: #ffffff;
     transform: translateY(-1px);
-    box-shadow: 0 4px 18px rgba(66,133,244,0.25);
+    box-shadow: 0 4px 18px rgba(251,188,5,0.22);
   }
 
   .sprint-assess-btn {
@@ -163,7 +192,7 @@ const STYLES = `
   .sprint-assess-btn:hover {
     background: linear-gradient(135deg, rgba(251,188,5,0.3), rgba(255,159,0,0.18));
     border-color: rgba(251,188,5,0.85);
-    color: #ffe38a;
+    color: #ffffff;
     transform: translateY(-1px);
     box-shadow: 0 4px 18px rgba(251,188,5,0.22);
   }
@@ -174,9 +203,9 @@ const STYLES = `
     gap: 0.45rem;
     padding: 0.6rem 1.3rem;
     border-radius: 30px;
-    border: 1.5px solid rgba(66,133,244,0.5);
-    background: linear-gradient(135deg, rgba(66,133,244,0.2), rgba(52,168,235,0.1));
-    color: #6db3ff;
+    border: 1.5px solid rgba(251,188,5,0.5);
+    background: linear-gradient(135deg, rgba(251,188,5,0.15), rgba(255,159,0,0.08));
+    color: #ffd055;
     font-size: 0.88rem;
     font-weight: 700;
     font-family: 'Inter', sans-serif;
@@ -185,10 +214,10 @@ const STYLES = `
     transition: all 0.25s ease;
   }
   .sprint-add-btn:hover {
-    background: linear-gradient(135deg, rgba(66,133,244,0.35), rgba(52,168,235,0.2));
-    border-color: rgba(66,133,244,0.85);
+    background: linear-gradient(135deg, rgba(251,188,5,0.3), rgba(255,159,0,0.18));
+    border-color: rgba(251,188,5,0.85);
     transform: translateY(-2px);
-    box-shadow: 0 5px 20px rgba(66,133,244,0.3);
+    box-shadow: 0 5px 20px rgba(251,188,5,0.3);
   }
 
   .sprint-add-btn.weekly-add {
@@ -320,6 +349,44 @@ export default function CodingSprintSection() {
 
   const isAdmin = role?.toLowerCase() === 'admin';
 
+  const [unlockedIndex, setUnlockedIndex] = useState(0);
+  const [verifyingIdx, setVerifyingIdx] = useState(null);
+  const [verifyError, setVerifyError] = useState("");
+  const [verifySuccess, setVerifySuccess] = useState("");
+
+  const handleVerifyCommit = async (idx) => {
+    const email = localStorage.getItem("email") || "";
+    if (!email) {
+      setVerifyError("User email not found. Please log in again.");
+      return;
+    }
+    setVerifyingIdx(idx);
+    setVerifyError("");
+    setVerifySuccess("");
+
+    try {
+      const res = await fetch(`http://localhost:8000/check/commit/github?email=${encodeURIComponent(email)}`, {
+        method: "POST"
+      });
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      const data = await res.json();
+      if (data.solved === true) {
+        const nextIndex = data.last_solved_question !== undefined ? data.last_solved_question : (idx + 1);
+        setUnlockedIndex(nextIndex);
+        setVerifySuccess(`Question ${idx + 1} verified successfully! Next question unlocked.`);
+      } else {
+        setVerifyError("Verification failed: Solution not found. Please make sure you push your commits to your GitHub repository.");
+      }
+    } catch (err) {
+      console.error("Verification error:", err);
+      setVerifyError(`Failed to verify commit: ${err.message}`);
+    } finally {
+      setVerifyingIdx(null);
+    }
+  };
+
   useEffect(() => {
     const fetchRole = async () => {
       try {
@@ -371,8 +438,26 @@ export default function CodingSprintSection() {
       }
     };
 
+    const fetchLastSolved = async () => {
+      try {
+        const email = localStorage.getItem("email") || "";
+        if (!email) return;
+        const res = await fetch(
+          `http://localhost:8000/get/last/solved/ques?email=${encodeURIComponent(email)}`,
+          { method: "GET" }
+        );
+        if (res.ok) {
+          const data = await res.json();
+          setUnlockedIndex(data.last_solved_question || 0);
+        }
+      } catch (err) {
+        console.error("Error fetching last solved question:", err);
+      }
+    };
+
     fetchRole();
     fetchAllQuestions();
+    fetchLastSolved();
   }, []);
 
   const handleAddQuestion = async (e) => {
@@ -436,19 +521,38 @@ export default function CodingSprintSection() {
     </div>
   );
 
+  const isSectionEmpty = 
+    (activeTab === 'weekly' && assessments.length === 0) || 
+    (activeTab === 'daily' && questions.length === 0);
+
   return (
     <section
       id="coding-sprint"
       style={{
-        backgroundImage: `linear-gradient(rgba(3, 5, 9, 0.55), rgba(3, 5, 9, 0.75)), url(${bgImage3})`,
-        backgroundSize: 'cover',
-        backgroundAttachment: 'fixed',
-        padding: '7rem 0 6rem',
+        padding: isSectionEmpty ? '0' : '7rem 0 6rem',
+        height: isSectionEmpty ? 'calc(100vh - 72px)' : 'auto',
+        minHeight: isSectionEmpty ? 'calc(100vh - 72px)' : 'none',
+        display: isSectionEmpty ? 'flex' : 'block',
+        flexDirection: 'column',
+        justifyContent: 'center',
         position: 'relative',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        boxSizing: 'border-box'
       }}
     >
       <style>{STYLES}</style>
+
+      {/* Blurred and darkened background image */}
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        backgroundImage: `url(${bgImage3})`,
+        backgroundSize: '110% 110%',
+        backgroundRepeat: 'no-repeat',
+        backgroundPosition: 'center',
+        filter: 'blur(8px) brightness(0.6)',
+        zIndex: 0
+      }} />
 
       {/* Decorative glow orbs */}
       <div style={{
@@ -464,7 +568,7 @@ export default function CodingSprintSection() {
         borderRadius: '50%', pointerEvents: 'none', filter: 'blur(60px)'
       }} />
 
-      <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 2rem', position: 'relative', zIndex: 1 }}>
+      <div style={{ maxWidth: '1100px', width: '100%', boxSizing: 'border-box', margin: '0 auto', padding: '0 2rem', position: 'relative', zIndex: 1 }}>
 
         {/* Section Header */}
         <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
@@ -495,12 +599,11 @@ export default function CodingSprintSection() {
             Coding Sprints
           </h2>
           <p style={{
-            color: 'rgba(255,255,255,0.5)',
+            color: '#f8fafc',
             fontSize: '1.05rem',
             fontFamily: 'Inter, sans-serif',
-            maxWidth: '540px',
-            margin: '0 auto',
-            lineHeight: 1.65
+            lineHeight: 1.65,
+            textShadow: '0 1px 3px rgba(0, 0, 0, 0.85)'
           }}>
             Sharpen your logic, write high-performance solutions, and climb the scoreboard.
           </p>
@@ -535,8 +638,8 @@ export default function CodingSprintSection() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
                   <div style={{
                     width: '8px', height: '8px', borderRadius: '50%',
-                    background: '#4285F4',
-                    boxShadow: '0 0 10px rgba(66,133,244,0.7)'
+                    background: '#FBBC05',
+                    boxShadow: '0 0 10px rgba(251,188,5,0.7)'
                   }} />
                   <h3 style={{
                     color: '#f1f5f9', margin: 0, fontSize: '1.15rem',
@@ -546,9 +649,9 @@ export default function CodingSprintSection() {
                   </h3>
                   {!loading && (
                     <span style={{
-                      background: 'rgba(66,133,244,0.15)',
-                      border: '1px solid rgba(66,133,244,0.3)',
-                      color: '#6db3ff',
+                      background: 'rgba(251,188,5,0.12)',
+                      border: '1px solid rgba(251,188,5,0.3)',
+                      color: '#ffd055',
                       borderRadius: '50px',
                       padding: '0.15rem 0.65rem',
                       fontSize: '0.78rem',
@@ -569,19 +672,57 @@ export default function CodingSprintSection() {
 
               {/* Questions Card */}
               <div style={{
-                background: 'rgba(8, 14, 28, 0.6)',
-                border: '1px solid rgba(255,255,255,0.07)',
+                background: 'rgba(8, 14, 28, 0.88)',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
                 borderRadius: '18px',
                 padding: '1.5rem',
                 backdropFilter: 'blur(16px)',
-                boxShadow: '0 8px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06)'
+                boxShadow: '0 8px 40px rgba(0, 0, 0, 0.45)'
               }}>
+                {verifySuccess && (
+                  <div style={{
+                    marginBottom: '1rem',
+                    padding: '0.75rem 1rem',
+                    borderRadius: '10px',
+                    background: 'rgba(34, 197, 94, 0.15)',
+                    border: '1px solid rgba(34, 197, 94, 0.4)',
+                    color: '#4ade80',
+                    fontSize: '0.85rem',
+                    fontWeight: '600',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    animation: 'fadeInUp 0.3s ease'
+                  }}>
+                    <CheckCircle size={16} />
+                    {verifySuccess}
+                  </div>
+                )}
+                {verifyError && (
+                  <div style={{
+                    marginBottom: '1rem',
+                    padding: '0.75rem 1rem',
+                    borderRadius: '10px',
+                    background: 'rgba(239, 68, 68, 0.15)',
+                    border: '1px solid rgba(239, 68, 68, 0.4)',
+                    color: '#ef4444',
+                    fontSize: '0.85rem',
+                    fontWeight: '600',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.5rem',
+                    animation: 'fadeInUp 0.3s ease'
+                  }}>
+                    <AlertCircle size={16} />
+                    {verifyError}
+                  </div>
+                )}
                 {loading ? (
-                  <LoadingCard color="#4285F4" />
+                  <LoadingCard color="#FBBC05" />
                 ) : questions.length === 0 ? (
                   <div className="sprint-empty-state">
                     <div className="sprint-empty-icon daily-icon">
-                      <Target size={22} color="rgba(66,133,244,0.7)" />
+                      <Target size={22} color="rgba(251,188,5,0.7)" />
                     </div>
                     <p style={{ color: 'rgba(148,163,184,0.8)', fontFamily: 'Inter, sans-serif', margin: 0, fontSize: '0.95rem', fontWeight: '500' }}>
                       No questions added yet
@@ -592,48 +733,126 @@ export default function CodingSprintSection() {
                   </div>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                    {questions.map((q, idx) => (
-                      <div className="sprint-question-card" key={q.id || q._id || idx}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', overflow: 'hidden', flex: 1 }}>
-                          <span style={{
-                            minWidth: '28px', height: '28px',
-                            borderRadius: '8px',
-                            background: 'linear-gradient(135deg, rgba(66,133,244,0.25), rgba(52,168,235,0.15))',
-                            border: '1px solid rgba(66,133,244,0.3)',
-                            color: '#6db3ff',
-                            fontWeight: '700',
-                            fontSize: '0.78rem',
-                            fontFamily: 'Inter, sans-serif',
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            flexShrink: 0
-                          }}>
-                            {idx + 1}
-                          </span>
-                          <span style={{
-                            color: '#e2e8f0',
-                            fontWeight: '600',
-                            fontSize: '0.97rem',
-                            fontFamily: 'Inter, sans-serif',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap'
-                          }}>
-                            {q.title}
-                          </span>
-                        </div>
-                        <a
-                          href={q.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="sprint-solve-btn"
+                    {questions.map((q, idx) => {
+                      const isLocked = idx > unlockedIndex;
+                      const isSolved = idx < unlockedIndex;
+
+                      return (
+                        <div
+                          className={`sprint-question-card${isLocked ? ' locked' : ''}`}
+                          key={q.id || q._id || idx}
+                          style={isLocked ? {
+                            opacity: 0.45,
+                            pointerEvents: 'none',
+                            userSelect: 'none',
+                            borderColor: 'rgba(255,255,255,0.03)',
+                            background: 'rgba(10, 16, 32, 0.4)'
+                          } : {}}
                         >
-                          <ExternalLink size={13} />
-                          Solve
-                        </a>
-                      </div>
-                    ))}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem', overflow: 'hidden', flex: 1 }}>
+                            <span style={{
+                              minWidth: '28px', height: '28px',
+                              borderRadius: '8px',
+                              background: isLocked
+                                ? 'linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))'
+                                : isSolved
+                                ? 'linear-gradient(135deg, rgba(34,197,94,0.2), rgba(34,197,94,0.1))'
+                                : 'linear-gradient(135deg, rgba(251,188,5,0.2), rgba(255,159,0,0.12))',
+                              border: isLocked
+                                ? '1px solid rgba(255,255,255,0.1)'
+                                : isSolved
+                                ? '1px solid rgba(34,197,94,0.4)'
+                                : '1px solid rgba(251,188,5,0.3)',
+                              color: isLocked ? '#64748b' : isSolved ? '#4ade80' : '#ffd055',
+                              fontWeight: '700',
+                              fontSize: '0.78rem',
+                              fontFamily: 'Inter, sans-serif',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              flexShrink: 0
+                            }}>
+                              {idx + 1}
+                            </span>
+                            <span style={{
+                              color: isLocked ? '#64748b' : '#ffffff',
+                              fontWeight: '700',
+                              fontSize: '0.97rem',
+                              fontFamily: 'Inter, sans-serif',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap'
+                            }}>
+                              {q.title}
+                            </span>
+                          </div>
+                          {isLocked ? (
+                            <span style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.35rem',
+                              padding: '0.45rem 1rem',
+                              borderRadius: '30px',
+                              background: 'rgba(255, 255, 255, 0.03)',
+                              border: '1px solid rgba(255, 255, 255, 0.08)',
+                              color: 'rgba(255, 255, 255, 0.4)',
+                              fontSize: '0.82rem',
+                              fontWeight: '600',
+                              fontFamily: 'Inter, sans-serif'
+                            }}>
+                              <Lock size={13} />
+                              Locked
+                            </span>
+                          ) : isSolved ? (
+                            <span style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.35rem',
+                              padding: '0.45rem 1rem',
+                              borderRadius: '30px',
+                              background: 'rgba(34, 197, 94, 0.12)',
+                              border: '1.5px solid rgba(34, 197, 94, 0.4)',
+                              color: '#4ade80',
+                              fontSize: '0.82rem',
+                              fontWeight: '700',
+                              fontFamily: 'Inter, sans-serif'
+                            }}>
+                              <CheckCircle size={13} />
+                              Verified
+                            </span>
+                          ) : (
+                            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                              <a
+                                href={q.link}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="sprint-solve-btn"
+                              >
+                                <ExternalLink size={13} />
+                                Solve
+                              </a>
+                              <button
+                                onClick={() => handleVerifyCommit(idx)}
+                                disabled={verifyingIdx !== null}
+                                className="sprint-verify-btn"
+                              >
+                                {verifyingIdx === idx ? (
+                                  <>
+                                    <Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} />
+                                    Verifying...
+                                  </>
+                                ) : (
+                                  <>
+                                    <Zap size={13} />
+                                    Verify Push
+                                  </>
+                                )}
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -682,12 +901,12 @@ export default function CodingSprintSection() {
 
               {/* Assessments Card */}
               <div style={{
-                background: 'rgba(8, 14, 28, 0.6)',
-                border: '1px solid rgba(255,255,255,0.07)',
+                background: 'rgba(8, 14, 28, 0.88)',
+                border: '1px solid rgba(255, 255, 255, 0.12)',
                 borderRadius: '18px',
                 padding: '1.5rem',
                 backdropFilter: 'blur(16px)',
-                boxShadow: '0 8px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06)'
+                boxShadow: '0 8px 40px rgba(0, 0, 0, 0.45)'
               }}>
                 {loading ? (
                   <LoadingCard color="#FBBC05" />
@@ -725,8 +944,8 @@ export default function CodingSprintSection() {
                             {idx + 1}
                           </span>
                           <span style={{
-                            color: '#e2e8f0',
-                            fontWeight: '600',
+                            color: '#ffffff',
+                            fontWeight: '700',
                             fontSize: '0.97rem',
                             fontFamily: 'Inter, sans-serif',
                             overflow: 'hidden',
