@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import { Zap, Terminal, Menu, Monitor, X, User, Star, GitBranch, Mail, Shield, ChevronRight } from 'lucide-react';
 
 /* ── Mock user profile — replace with real auth data as needed ── */
@@ -15,6 +15,8 @@ export default function Header({ xp, level, levelTitle, streak, consoleGlitch, s
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef(null);
+  const location = useLocation();
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
 
   /* Close overlay on outside click */
   useEffect(() => {
@@ -33,21 +35,13 @@ export default function Header({ xp, level, levelTitle, streak, consoleGlitch, s
 
   return (
     <>
-      <header className="main-header">
+      <header className="main-header" style={{ background: '#000000' }}>
         <div className="header-container">
           <div className="logo">
             <Link to="/">
               <span className="logo-prompt">&gt;</span> GOOGLE COHORT<span className="logo-accent"></span>
             </Link>
           </div>
-          <nav className="nav-links">
-            <NavLink to="/how-it-works" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>How It Works</NavLink>
-            <NavLink to="/weekly-system" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>Weekly System</NavLink>
-            <NavLink to="/sprint" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>Daily / Weekly Coding Sprint</NavLink>
-            <NavLink to="/buddy-system" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>Buddy System</NavLink>
-            <NavLink to="/xp-system" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>XP Dashboard</NavLink>
-            <NavLink to="/daily-cycle" className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}>Daily Cycle</NavLink>
-          </nav>
 
           <div className="header-actions">
             {/* XP Badge */}
@@ -249,36 +243,266 @@ export default function Header({ xp, level, levelTitle, streak, consoleGlitch, s
               )}
             </div>
 
-          </div>
+            {/* ── Hamburger / Three-Dash Menu Button ── */}
+            <button
+              className="hamburger-btn"
+              id="hamburger-menu-btn"
+              onClick={() => setMobileMenuOpen(true)}
+              aria-label="Open navigation menu"
+            >
+              <span className="hamburger-line"></span>
+              <span className="hamburger-line"></span>
+              <span className="hamburger-line"></span>
+            </button>
 
-          <button
-            className="mobile-menu-toggle"
-            id="menu-toggle"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          </div>
         </div>
       </header>
 
-      <div className={`mobile-nav ${mobileMenuOpen ? 'active' : ''}`} id="mobile-nav">
-        <Link to="/how-it-works" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>How It Works</Link>
-        <Link to="/sprint" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Coding Sprint</Link>
-        <Link to="/build-sprint" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Build Sprint</Link>
-        <Link to="/buddy-system" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Buddy System</Link>
-        <Link to="/xp-system" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>XP Dashboard</Link>
-        <Link to="/daily-cycle" className="mobile-nav-link" onClick={() => setMobileMenuOpen(false)}>Daily Cycle</Link>
-        <div className="mobile-nav-footer">
-          <Link to="/apply-now" className="btn btn-primary w-full text-center" onClick={() => setMobileMenuOpen(false)}>Apply Now</Link>
-        </div>
-      </div>
+      {/* ── Full-Screen Navigation Overlay ── */}
+      {mobileMenuOpen && (
+        <div
+          className="nav-overlay"
+          id="nav-overlay"
+          onClick={(e) => { if (e.target === e.currentTarget) setMobileMenuOpen(false); }}
+        >
+          <div className="nav-overlay-panel">
+            {/* Close button */}
+            <button
+              className="nav-overlay-close"
+              id="nav-overlay-close"
+              onClick={() => setMobileMenuOpen(false)}
+              aria-label="Close navigation menu"
+            >
+              <X size={24} />
+            </button>
 
-      {/* Keyframe for overlay drop animation */}
+            {/* Brand */}
+            <div className="nav-overlay-brand">
+              <span className="logo-prompt">&gt;</span> GOOGLE COHORT
+            </div>
+
+            {/* Nav items */}
+            <nav className="nav-overlay-links">
+              {[
+                { to: '/how-it-works',   label: 'How It Works',              num: '01' },
+                { to: '/weekly-system',  label: 'Weekly System',             num: '02' },
+                { to: '/sprint',         label: 'Daily / Weekly Coding Sprint', num: '03' },
+                { to: '/build-sprint',   label: 'Build Sprint',              num: '04' },
+                { to: '/buddy-system',   label: 'Buddy System',              num: '05' },
+                { to: '/xp-system',      label: 'XP Dashboard',             num: '06' },
+                { to: '/daily-cycle',    label: 'Daily Cycle',               num: '07' },
+                { to: '/faq',            label: 'FAQ',                       num: '08' },
+              ].map((item, i) => (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  className={({ isActive }) => `nav-overlay-link${isActive ? ' nav-overlay-link--active' : ''}`}
+                  onClick={() => setMobileMenuOpen(false)}
+                  style={{ animationDelay: `${i * 0.06}s` }}
+                >
+                  <span className="nav-overlay-num">{item.num}</span>
+                  <span className="nav-overlay-label">{item.label}</span>
+                  <ChevronRight className="nav-overlay-arrow" size={18} />
+                </NavLink>
+              ))}
+            </nav>
+
+            {/* Footer: Logout only */}
+            <div className="nav-overlay-footer">
+              <Link
+                to="/login"
+                className="btn btn-primary nav-overlay-cta"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Logout
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Keyframe animations */}
       <style>{`
         @keyframes fadeSlideDown {
           from { opacity: 0; transform: translateY(-8px); }
           to   { opacity: 1; transform: translateY(0); }
         }
+
+        /* ── Hamburger button ── */
+        .hamburger-btn {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          gap: 5px;
+          width: 42px;
+          height: 42px;
+          background: rgba(0,240,255,0.06);
+          border: 1px solid rgba(0,240,255,0.25);
+          border-radius: 10px;
+          cursor: pointer;
+          transition: background 0.25s, border-color 0.25s, box-shadow 0.25s;
+          flex-shrink: 0;
+          padding: 0;
+        }
+        .hamburger-btn:hover {
+          background: rgba(0,240,255,0.14);
+          border-color: rgba(0,240,255,0.55);
+          box-shadow: 0 0 14px rgba(0,240,255,0.25);
+        }
+        .hamburger-line {
+          display: block;
+          width: 20px;
+          height: 2px;
+          border-radius: 2px;
+          background: #00f0ff;
+          transition: all 0.25s;
+        }
+
+        /* ── Overlay backdrop ── */
+        .nav-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(3, 8, 19, 0.75);
+          backdrop-filter: blur(6px);
+          -webkit-backdrop-filter: blur(6px);
+          z-index: 9999;
+          display: flex;
+          justify-content: flex-end;
+          animation: overlayFadeIn 0.25s ease;
+        }
+        @keyframes overlayFadeIn {
+          from { opacity: 0; }
+          to   { opacity: 1; }
+        }
+
+        /* ── Slide-in panel ── */
+        .nav-overlay-panel {
+          width: min(420px, 100vw);
+          height: 100%;
+          background: rgba(5, 8, 22, 0.97);
+          backdrop-filter: blur(32px);
+          -webkit-backdrop-filter: blur(32px);
+          border-left: 1px solid rgba(0,240,255,0.18);
+          display: flex;
+          flex-direction: column;
+          padding: 2rem 2rem 2.5rem;
+          overflow-y: auto;
+          animation: panelSlideIn 0.3s cubic-bezier(0.22,1,0.36,1);
+          position: relative;
+        }
+        @keyframes panelSlideIn {
+          from { transform: translateX(100%); opacity: 0; }
+          to   { transform: translateX(0);    opacity: 1; }
+        }
+
+        /* ── Close button ── */
+        .nav-overlay-close {
+          position: absolute;
+          top: 1.5rem;
+          right: 1.5rem;
+          width: 38px;
+          height: 38px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: rgba(0,240,255,0.07);
+          border: 1px solid rgba(0,240,255,0.2);
+          border-radius: 50%;
+          color: #00f0ff;
+          cursor: pointer;
+          transition: background 0.2s, transform 0.2s;
+        }
+        .nav-overlay-close:hover {
+          background: rgba(0,240,255,0.18);
+          transform: rotate(90deg);
+        }
+
+        /* ── Brand ── */
+        .nav-overlay-brand {
+          font-family: var(--font-mono, monospace);
+          font-size: 1rem;
+          font-weight: 800;
+          color: #00f0ff;
+          letter-spacing: 0.12em;
+          margin-bottom: 2.5rem;
+          margin-top: 0.25rem;
+        }
+
+        /* ── Nav links ── */
+        .nav-overlay-links {
+          display: flex;
+          flex-direction: column;
+          gap: 0.25rem;
+          flex: 1;
+        }
+        .nav-overlay-link {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          padding: 0.85rem 1rem;
+          border-radius: 12px;
+          text-decoration: none;
+          color: rgba(200,230,255,0.85);
+          border: 1px solid transparent;
+          transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.2s;
+          animation: linkFadeUp 0.35s ease both;
+        }
+        @keyframes linkFadeUp {
+          from { opacity: 0; transform: translateX(20px); }
+          to   { opacity: 1; transform: translateX(0); }
+        }
+        .nav-overlay-link:hover {
+          background: rgba(0,240,255,0.08);
+          border-color: rgba(0,240,255,0.2);
+          color: #00f0ff;
+          transform: translateX(4px);
+        }
+        .nav-overlay-link--active {
+          background: rgba(0,240,255,0.12);
+          border-color: rgba(0,240,255,0.35);
+          color: #00f0ff;
+        }
+        .nav-overlay-num {
+          font-family: var(--font-mono, monospace);
+          font-size: 0.7rem;
+          color: rgba(0,240,255,0.45);
+          width: 24px;
+          flex-shrink: 0;
+        }
+        .nav-overlay-label {
+          flex: 1;
+          font-size: 0.95rem;
+          font-weight: 600;
+          letter-spacing: 0.02em;
+        }
+        .nav-overlay-arrow {
+          color: rgba(0,240,255,0.35);
+          transition: color 0.2s, transform 0.2s;
+        }
+        .nav-overlay-link:hover .nav-overlay-arrow,
+        .nav-overlay-link--active .nav-overlay-arrow {
+          color: #00f0ff;
+          transform: translateX(3px);
+        }
+
+        /* ── Footer Logout ── */
+        .nav-overlay-footer {
+          margin-top: 2rem;
+          display: flex;
+          flex-direction: column;
+          gap: 0.75rem;
+          border-top: 1px solid rgba(0,240,255,0.1);
+          padding-top: 1.5rem;
+        }
+        .nav-overlay-cta {
+          text-align: center;
+          font-size: 0.95rem;
+        }
+
+        /* Hide old mobile-menu-toggle if still in DOM */
+        .mobile-menu-toggle { display: none !important; }
       `}</style>
     </>
   );

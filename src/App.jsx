@@ -45,6 +45,8 @@ export default function App() {
   const location = useLocation();
   const isHome = location.pathname === '/';
   const isApply = location.pathname === '/apply-now';
+  const isLogin = location.pathname === '/login';
+  const isRegister = location.pathname === '/register';
 
   useEffect(() => {
     const saved = localStorage.getItem("velocity_cohort_state");
@@ -276,7 +278,7 @@ export default function App() {
         </Routes>
       </main>
 
-      <Footer />
+      {isHome && <Footer />}
     </div>
   );
 }

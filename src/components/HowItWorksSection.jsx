@@ -11,65 +11,109 @@ export default function HowItWorksSection() {
       <div 
         className="google-hero"
         style={{
-          backgroundImage: `linear-gradient(rgba(3, 5, 9, 0.45), rgba(3, 5, 9, 0.60)), url(${googleBrightLobby})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundAttachment: 'fixed',
-          padding: '8rem 2rem',
-          textAlign: 'center',
+          position: 'relative',
+          overflow: 'hidden',
+          height: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          boxSizing: 'border-box',
           borderBottom: '1px solid rgba(0, 240, 255, 0.2)'
         }}
       >
-        <div className="container" style={{ maxWidth: '900px', margin: '0 auto' }}>
-          <h1 style={{
-            fontSize: '3.5rem',
-            marginBottom: '1.5rem',
-            background: 'linear-gradient(90deg, #4285F4, #EA4335, #FBBC05, #34A853)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            fontWeight: 800,
-            filter: 'drop-shadow(0 2px 12px rgba(0,0,0,0.85)) drop-shadow(0 0 24px rgba(0,0,0,0.7))',
-            padding: '0.5rem 1rem',
-            borderRadius: '12px',
-            background: 'linear-gradient(90deg, #4285F4, #EA4335, #FBBC05, #34A853)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text',
-            boxShadow: '0 4px 32px rgba(0,0,0,0.55)',
-          }}>
-           Welcome to the 13-Month Google Velocity Cohort
-          </h1>
-          <div className="glass-card" style={{ padding: '3rem', textAlign: 'left', marginTop: '3rem' }}>
-            <div style={{
-              background: 'linear-gradient(135deg, rgba(66, 133, 244, 0.1), rgba(234, 67, 53, 0.1))',
-              border: '2px solid #4285F4',
-              borderRadius: '12px',
-              padding: '2rem',
-              marginBottom: '3rem',
-              textAlign: 'center',
-              boxShadow: '0 10px 30px rgba(66, 133, 244, 0.15)'
-            }}>
-              <p style={{ fontSize: '1.8rem', fontWeight: '800', fontStyle: 'italic', color: '#fff', marginBottom: '1rem', lineHeight: '1.4' }}>
-                "I Know it is difficult and Boring but it is definitely worth Cracking it so never ever give up!"
-              </p>
-              <div style={{ height: '4px', width: '60px', background: '#FBBC05', margin: '0 auto' }}></div>
-            </div>
+        {/* Absolute Background Photo */}
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          backgroundImage: `linear-gradient(rgba(3, 5, 9, 0.30), rgba(3, 5, 9, 0.45)), url(${googleBrightExterior})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          zIndex: 0
+        }} />
 
-            <h2 style={{ color: '#4285F4', marginBottom: '1rem' }}>First of all...</h2>
-            <p style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem', color: '#fff' }}>Thank you for joining the Google Velocity Cohort! ❤️</p>
-            <p style={{ marginBottom: '0.75rem', fontSize: '1.1rem', color: 'var(--text-muted)' }}>Today isn't just another day.</p>
-            <p style={{ marginBottom: '0.75rem', fontSize: '1.1rem', color: 'var(--text-muted)' }}>Today is the day you decided to invest in yourself.</p>
-            <p style={{ marginBottom: '1.5rem', fontSize: '1.1rem', color: 'var(--text-muted)' }}>For the next <strong style={{color: '#fff'}}>13 months</strong>, your mission is simple:</p>
-            
-            <blockquote style={{ borderLeft: '4px solid #EA4335', margin: '2rem 0', fontSize: '1.4rem', fontStyle: 'italic', background: 'rgba(234, 67, 53, 0.1)', padding: '1.5rem', borderRadius: '0 8px 8px 0', color: '#fff' }}>
-              <strong>To become capable of cracking the Google Software Engineer interview.</strong>
-            </blockquote>
-            
-            <p style={{ marginBottom: '0.75rem', fontSize: '1.1rem', color: 'var(--text-muted)' }}>This journey is not for everyone.</p>
-            <p style={{ marginBottom: '0.75rem', fontSize: '1.1rem', color: 'var(--text-muted)' }}>It is for people who are willing to stay consistent when others quit.</p>
-            <p style={{ marginBottom: '1.5rem', fontSize: '1.1rem', color: 'var(--text-muted)' }}>It is for people who choose discipline over excuses.</p>
-            <p style={{ fontSize: '1.2rem', color: '#34A853', fontWeight: 'bold' }}>If you trust the process and give your best every single day, there is absolutely no reason why you cannot become Google-ready by the end of this journey.</p>
-          </div>
+        {/* Absolute Glass Overlay covering full hero area */}
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'rgba(8, 13, 26, 0.65)',
+          backdropFilter: 'blur(10px)',
+          WebkitBackdropFilter: 'blur(10px)',
+          zIndex: 1
+        }} />
+
+        <style>{`
+          @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+          .tech-font {
+            font-family: 'Space Grotesk', sans-serif !important;
+          }
+          .tech-font h2, 
+          .tech-font p, 
+          .tech-font blockquote, 
+          .tech-font strong,
+          .tech-font span {
+            font-family: 'Space Grotesk', sans-serif !important;
+          }
+        `}</style>
+
+        <div className="tech-font" style={{ maxWidth: '1320px', width: '92%', margin: '0 auto', position: 'relative', zIndex: 2, textAlign: 'center', transform: 'translateY(-20px)' }}>
+          {/* Quote Header */}
+          <span style={{ display: 'block', fontSize: '1.2rem', fontWeight: '800', letterSpacing: '0.08em', color: '#FBBC05', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
+            💬 Quote of the Journey
+          </span>
+          
+          {/* Quote Text */}
+          <h1 style={{ 
+            fontSize: '1.85rem', 
+            fontWeight: '700', 
+            fontStyle: 'italic', 
+            color: '#ffffff', 
+            lineHeight: '1.45', 
+            marginBottom: '1.25rem',
+            padding: '0 1rem'
+          }}>
+            "Success at Google is not built in one day. It is built by showing up every single day for 13 months."
+          </h1>
+
+          {/* Separation Line */}
+          <div style={{ height: '2px', width: '60px', background: '#FBBC05', margin: '0 auto 1.5rem auto' }}></div>
+
+          {/* Main Content */}
+          <h2 style={{ color: '#ffffff', marginBottom: '0.35rem', fontSize: '1.65rem', fontWeight: 800 }}>
+            First of all
+          </h2>
+          <p style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '0.75rem', color: '#ffffff' }}>
+            Thank you for joining the Google Velocity Cohort ❤️
+          </p>
+          
+          <p style={{ marginBottom: '0.35rem', fontSize: '1.05rem', color: '#e2e8f0', fontWeight: '500' }}>Today isn't just another day.</p>
+          <p style={{ marginBottom: '0.35rem', fontSize: '1.05rem', color: '#e2e8f0', fontWeight: '500' }}>Today is the day you decided to invest in yourself.</p>
+          <p style={{ marginBottom: '0.75rem', fontSize: '1.05rem', color: '#e2e8f0', fontWeight: '500' }}>
+            For the next <strong style={{ color: '#FBBC05', fontWeight: '700' }}>13 months</strong>, your mission is simple:
+          </p>
+          
+          <blockquote style={{ 
+            borderLeft: '4px solid #FBBC05', 
+            margin: '0.75rem auto', 
+            maxWidth: '1100px',
+            width: '85%',
+            fontSize: '1.35rem', 
+            fontStyle: 'italic', 
+            background: 'rgba(251, 188, 5, 0.1)', 
+            padding: '0.6rem 1rem', 
+            borderRadius: '0 6px 6px 0', 
+            color: '#ffffff',
+            fontWeight: '700'
+          }}>
+            To become capable of cracking the Google Software Engineer interview.
+          </blockquote>
+          
+          <p style={{ marginBottom: '0.35rem', fontSize: '1.05rem', color: '#e2e8f0', fontWeight: '500' }}>This journey is not for everyone.</p>
+          <p style={{ marginBottom: '0.35rem', fontSize: '1.05rem', color: '#e2e8f0', fontWeight: '500' }}>It is for people who are willing to stay consistent when others quit.</p>
+          <p style={{ marginBottom: '0.75rem', fontSize: '1.05rem', color: '#e2e8f0', fontWeight: '500' }}>It is for people who choose discipline over excuses.</p>
+          
+          <p style={{ fontSize: '1.2rem', color: '#ffffff', fontWeight: '700', lineHeight: '1.45', marginTop: '1.25rem' }}>
+            If you trust the process and give your best every single day, there is absolutely no reason why you cannot become Google-ready by the end of this journey.
+          </p>
         </div>
       </div>
 
