@@ -1,3 +1,5 @@
+from starlette.types import Receive
+import secrets
 from requests import request
 import requests
 from fastapi.responses import RedirectResponse
@@ -7,6 +9,10 @@ from typing import Dict
 from fastapi import FastAPI, Body, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
+from smtplib import SMTP
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import secrets
 from datetime import datetime, timezone, timedelta
 # pyrefly: ignore [missing-import]
 from argon2.exceptions import VerifyMismatchError
@@ -53,15 +59,90 @@ async def register(data: dict):
                 detail="User already exists"
             )
         else:
+            otp = "".join(secrets.choice("0123456789")for i in range(6))
+            
+            html = f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {{
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }}
+        .container {{
+            max-width: 500px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }}
+        .otp {{
+            font-size: 32px;
+            font-weight: bold;
+            color: #2563eb;
+            letter-spacing: 5px;
+            margin: 20px 0;
+        }}
+        .footer {{
+            color: #666;
+            font-size: 12px;
+            margin-top: 20px;
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Email Verification</h2>
+
+        <p>Your One-Time Password (OTP) is:</p>
+
+        <div class="otp">{otp}</div>
+
+        <p>This OTP is valid for <strong>5 minutes</strong>.</p>
+
+        <p>If you didn't request this code, you can safely ignore this email.</p>
+
+        <div class="footer">
+            © 2026 Your Company
+        </div>
+    </div>
+</body>
+</html>
+"""
+            sender_email = "futrio.devs.ai@gmail.com"
+            receiver_email = data["email"]
+            message = MIMEMultipart()
+            message["From"] = sender_email
+            message["To"] = receiver_email
+            message["Subject"] = "Your Verification OTP"
+            text = MIMEText(html, "html")
+            message.attach(text)
+            try:
+                with SMTP("smtp.gmail.com", 587) as smtp:
+                    smtp.starttls()
+                    smtp.login(sender_email, os.getenv("play_pass"))
+                    smtp.sendmail(sender_email, receiver_email, message.as_string())
+            except Exception as e:
+                raise HTTPException(
+                    status_code=500,
+                    detail=str(e)
+                )
             ph = PasswordHasher()
             hashed = ph.hash(data["password"])
+            hashed_otp = ph.hash(otp)
             await userdb.insert_one({
                 "name": data["name"],
                 "email": data["email"],
                 "github_username": data["github_name"],
                 "password": hashed,
                 "role": "student",
-                "last_login": datetime.now(timezone.utc)
+                "last_login": datetime.now(timezone.utc),
+                "otp" : hashed_otp,
+                "otp_last_created" : datetime.now(timezone.utc)
             })
 
         return {"message": "User registered successfully"}
@@ -70,6 +151,154 @@ async def register(data: dict):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
+@app.post("/verifyotp")
+async def verify_otp(data: dict):
+    try:
+        email = data.get("email")
+        otp_val = data.get("otp_")
+        if not email or not otp_val:
+            raise HTTPException(
+                status_code=400,
+                detail="Email and OTP are required"
+            )
+
+        ph = PasswordHasher()
+        user = await userdb.find_one({"email": email})
+        if user is None:
+            raise HTTPException(
+                status_code=404,
+                detail="User Not Found"
+            )   
+        else:
+            try:
+                ph.verify(user["otp"], otp_val)
+                otp_created = user.get("otp_last_created")
+                if otp_created:
+                    if otp_created.tzinfo is None:
+                        otp_created = otp_created.replace(tzinfo=timezone.utc)
+                    if datetime.now(timezone.utc) - otp_created > timedelta(minutes=5):
+                        raise HTTPException(
+                            status_code=401,
+                            detail="OTP Expired"
+                        )
+                
+                await userdb.update_one(
+                    {"email": email},
+                    {"$unset": {"otp": "", "otp_last_created": ""}}
+                )
+                return {"message": "OTP verified successfully"}
+            except VerifyMismatchError:
+                raise HTTPException(
+                    status_code=401,
+                    detail="Invalid OTP"
+                )
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/otp/request/again")
+async def request_otp_again(data: dict):
+    try:
+        email = data.get("email")
+        if not email:
+            raise HTTPException(
+                status_code=400,
+                detail="Email is required"
+            )
+        
+        user = await userdb.find_one({"email": email})
+        if user is None:
+            raise HTTPException(
+                status_code=404,
+                detail="User Not Found"
+            )
+        else:
+            otp = "".join(secrets.choice("0123456789")for i in range(6))
+            
+            html = f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {{
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }}
+        .container {{
+            max-width: 500px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }}
+        .otp {{
+            font-size: 32px;
+            font-weight: bold;
+            color: #2563eb;
+            letter-spacing: 5px;
+            margin: 20px 0;
+        }}
+        .footer {{
+            color: #666;
+            font-size: 12px;
+            margin-top: 20px;
+        }}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Email Verification</h2>
+
+        <p>Your One-Time Password (OTP) is:</p>
+
+        <div class="otp">{otp}</div>
+
+        <p>This OTP is valid for <strong>5 minutes</strong>.</p>
+
+        <p>If you didn't request this code, you can safely ignore this email.</p>
+
+        <div class="footer">
+            © 2026 Your Company
+        </div>
+    </div>
+</body>
+</html>
+"""
+            sender_email = "futrio.devs.ai@gmail.com"
+            receiver_email = data["email"]
+            message = MIMEMultipart()
+            message["From"] = sender_email
+            message["To"] = receiver_email
+            message["Subject"] = "Your Verification OTP"
+            text = MIMEText(html, "html")
+            message.attach(text)
+            try:
+                with SMTP("smtp.gmail.com", 587) as smtp:
+                    smtp.starttls()
+                    smtp.login(sender_email, os.getenv("play_pass"))
+                    smtp.sendmail(sender_email, receiver_email, message.as_string())
+            except Exception as e:
+                raise HTTPException(
+                    status_code=500,
+                    detail=str(e)
+                )
+            ph = PasswordHasher()
+            hashed_otp = ph.hash(otp)
+            await userdb.update_one(
+                {"email":email},
+                {"$set": {"otp": hashed_otp, "otp_last_created": datetime.now(timezone.utc)}}
+            )
+            return {"message": "OTP sent successfully"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 @app.post("/logininpage")
 async def login(data: dict):
     try:

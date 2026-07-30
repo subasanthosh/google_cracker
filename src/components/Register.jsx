@@ -63,6 +63,8 @@ export default function Register({ earnXP }) {
   const [generatedKey, setGeneratedKey] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [showConnectOverlay, setShowConnectOverlay] = useState(false);
+  const [showOtpScreen, setShowOtpScreen] = useState(false);
+  const [otp, setOtp] = useState('');
 
   // Enforce complete scroll lock on document body and html while route is active
   useEffect(() => {
@@ -104,11 +106,45 @@ export default function Register({ earnXP }) {
       }
       else {
         localStorage.setItem("email", handle);
+        setShowOtpScreen(true);
+        setIsSubmitting(false);
+      }
+    } catch (err) {
+      setErrorMsg(`NETWORK_ERR: Cannot reach server. ${err.message}`);
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleOtpSubmit = async (e) => {
+    e.preventDefault();
+    if (!otp) {
+      setErrorMsg('INPUT_ERR: Please enter the verification OTP.');
+      return;
+    }
+
+    setErrorMsg('');
+    setIsSubmitting(true);
+
+    try {
+      const res = await fetch('http://127.0.0.1:8000/verifyotp', {
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+        body: JSON.stringify({ email: handle, otp_: otp }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setErrorMsg(`OTP_ERR [${res.status}]: ${data.detail ?? 'OTP verification failed'}`);
+        setIsSubmitting(false);
+        return;
       }
 
       /* ── Success: animate terminal logs then show key ── */
+      setShowOtpScreen(false);
       const candidateHandle = handle.startsWith('@') ? handle : `@${handle}`;
       const logs = [
+        `OTP verification successful...`,
         `Registering cohort profile: ${name}...`,
         `Handle: ${candidateHandle}...`,
         `Verifying GitHub repository access...`,
@@ -133,6 +169,34 @@ export default function Register({ earnXP }) {
         }, (index + 1) * 300);
       });
 
+    } catch (err) {
+      setErrorMsg(`NETWORK_ERR: Cannot reach server. ${err.message}`);
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    setErrorMsg('');
+    setIsSubmitting(true);
+    setTerminalLogs(prev => [...prev, 'Requesting new verification OTP...']);
+
+    try {
+      const res = await fetch('http://127.0.0.1:8000/otp/request/again', {
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+        body: JSON.stringify({ email: handle }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setErrorMsg(`RESEND_ERR [${res.status}]: ${data.detail ?? 'Failed to resend OTP'}`);
+        setIsSubmitting(false);
+        return;
+      }
+
+      setTerminalLogs(prev => [...prev, 'New verification OTP sent successfully!']);
+      setIsSubmitting(false);
     } catch (err) {
       setErrorMsg(`NETWORK_ERR: Cannot reach server. ${err.message}`);
       setIsSubmitting(false);
@@ -191,26 +255,117 @@ export default function Register({ earnXP }) {
         zIndex: 0,
       }} />
 
-      <div style={{ width: '100%', maxWidth: '520px', zIndex: 1, position: 'relative', boxSizing: 'border-box' }}>
+      <div style={{ width: '100%', maxWidth: showOtpScreen ? '420px' : '520px', zIndex: 1, position: 'relative', boxSizing: 'border-box' }}>
         <div style={light.card}>
 
           {/* ── Top bar ── */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '0.5rem', marginBottom: '0.75rem', borderBottom: '1px solid rgba(22, 163, 74, 0.15)' }}>
             <span style={{ ...light.label, display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Terminal size={13} /> READY FOR THE COHORT
+              <Terminal size={13} /> {showOtpScreen ? 'OTP_VERIFICATION.exe' : 'READY FOR THE COHORT'}
             </span>
             <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#16a34a', boxShadow: '0 0 8px #16a34a' }} />
           </div>
 
           {/* ── Heading ── */}
           <h2 style={{ color: '#0f172a', fontSize: '1.35rem', marginBottom: '0.1rem', textAlign: 'center', fontWeight: 800 }}>
-            Cohort Registration
+            {showOtpScreen ? 'OTP Verification' : 'Cohort Registration'}
           </h2>
           <p style={{ color: '#475569', fontSize: '0.78rem', textAlign: 'center', marginBottom: '0.85rem', fontWeight: 500 }}>
-            Let's Do It Together.
+            {showOtpScreen ? 'Enter the verification OTP sent to your email.' : "Let's Do It Together."}
           </p>
 
-          {!generatedKey ? (
+          {generatedKey ? (
+            /* ── Success state ── */
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', textAlign: 'center', padding: '0.5rem 0' }}>
+              <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(22, 163, 74, 0.08)', border: '1px solid rgba(22, 163, 74, 0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#16a34a', boxShadow: '0 0 15px rgba(22, 163, 74, 0.15)' }}>
+                  <ShieldCheck size={26} />
+                </div>
+              </div>
+              <h3 style={{ color: '#0f172a', fontSize: '1.2rem', fontWeight: 800 }}>Enrollment Keys Disbursed!</h3>
+              <div style={{ background: 'rgba(255, 255, 255, 0.75)', border: '1px solid rgba(22, 163, 74, 0.4)', padding: '0.6rem 1rem', borderRadius: '8px', color: '#16a34a', letterSpacing: '0.08em', fontSize: '0.95rem', fontWeight: 'bold', boxShadow: '0 0 15px rgba(22,163,74,0.08)' }}>
+                {generatedKey}
+              </div>
+              <p style={{ color: '#475569', fontSize: '0.78rem', fontWeight: 500 }}>
+                Access granted! Establishing connection & transferring protocols...
+              </p>
+              <div style={{ fontSize: '0.7rem', color: '#0070f3', fontWeight: 600 }}>
+                System redirecting to Home Dashboard...
+              </div>
+            </div>
+          ) : showOtpScreen ? (
+            /* ── OTP Form ── */
+            <form onSubmit={handleOtpSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                <label style={light.label}>VERIFICATION OTP</label>
+                <div style={{ position: 'relative' }}>
+                  <Lock size={15} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#15803d', pointerEvents: 'none' }} />
+                  <input
+                    type="text"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    placeholder="Enter 6-digit OTP"
+                    required
+                    style={light.input}
+                    onFocus={onFocusGreen}
+                    onBlur={onBlurGreen}
+                    disabled={isSubmitting}
+                  />
+                </div>
+              </div>
+
+              {errorMsg && (
+                <div style={{ fontSize: '0.74rem', color: '#b91c1c', display: 'flex', alignItems: 'center', gap: '6px', background: 'rgba(254, 226, 226, 0.8)', padding: '0.5rem 0.75rem', borderRadius: '8px', border: '1px solid rgba(239, 68, 68, 0.3)' }}>
+                  <span style={{ fontSize: '0.9rem' }}>⚠</span> {errorMsg}
+                </div>
+              )}
+
+              {terminalLogs.length > 0 && (
+                <div style={{ fontSize: '0.7rem', background: 'rgba(255, 255, 255, 0.6)', border: '1px solid rgba(22, 163, 74, 0.2)', padding: '0.5rem 0.75rem', borderRadius: '8px', color: '#16a34a', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                  {terminalLogs.map((log, idx) => (
+                    <div key={idx}>&gt; {log}</div>
+                  ))}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className={`btn-ripple${isSubmitting ? ' btn-loading' : ''}`}
+                style={{
+                  width: '100%',
+                  padding: '0.65rem',
+                  marginTop: '0.2rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  background: isSubmitting
+                    ? 'linear-gradient(135deg, #15803d 0%, #0056b3 100%)'
+                    : 'linear-gradient(135deg, #16a34a 0%, #00bcff 100%)',
+                  border: 'none',
+                  borderRadius: '8px',
+                  color: '#ffffff',
+                  fontWeight: '700',
+                  fontSize: '0.85rem',
+                  cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                  boxShadow: isSubmitting ? 'none' : '0 4px 14px rgba(22, 163, 74, 0.2)',
+                  transition: 'all 0.25s',
+                  letterSpacing: '0.05em',
+                }}
+              >
+                {isSubmitting ? (
+                  <>
+                    <span className="btn-spinner" style={{ borderTopColor: '#ffffff' }} />
+                    Verifying OTP...
+                  </>
+                ) : (
+                  <>Verify OTP <ArrowRight size={15} /></>
+                )}
+              </button>
+            </form>
+          ) : (
+            /* ── Register Form ── */
             <form onSubmit={handleRegisterSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
 
               {/* Row 1: Name & Email */}
@@ -356,38 +511,41 @@ export default function Register({ earnXP }) {
               </button>
 
             </form>
-          ) : (
-            /* ── Success state ── */
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', textAlign: 'center', padding: '0.5rem 0' }}>
-              <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(22, 163, 74, 0.08)', border: '1px solid rgba(22, 163, 74, 0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#16a34a', boxShadow: '0 0 15px rgba(22, 163, 74, 0.15)' }}>
-                  <ShieldCheck size={26} />
-                </div>
-              </div>
-              <h3 style={{ color: '#0f172a', fontSize: '1.2rem', fontWeight: 800 }}>Enrollment Keys Disbursed!</h3>
-              <div style={{ background: 'rgba(255, 255, 255, 0.75)', border: '1px solid rgba(22, 163, 74, 0.4)', padding: '0.6rem 1rem', borderRadius: '8px', color: '#16a34a', letterSpacing: '0.08em', fontSize: '0.95rem', fontWeight: 'bold', boxShadow: '0 0 15px rgba(22,163,74,0.08)' }}>
-                {generatedKey}
-              </div>
-              <p style={{ color: '#475569', fontSize: '0.78rem', fontWeight: 500 }}>
-                Access granted! Establishing connection & transferring protocols...
-              </p>
-              <div style={{ fontSize: '0.7rem', color: '#0070f3', fontWeight: 600 }}>
-                System redirecting to Home Dashboard...
-              </div>
-            </div>
           )}
 
           {/* ── Footer link ── */}
           {!generatedKey && (
             <div style={{ marginTop: '0.85rem', paddingTop: '0.75rem', textAlign: 'center', borderTop: '1px solid rgba(22, 163, 74, 0.15)' }}>
-              <span style={{ fontSize: '0.78rem', color: '#475569', fontWeight: 500 }}>Already registered in the cohort?</span>
+              <span style={{ fontSize: '0.78rem', color: '#475569', fontWeight: 500 }}>
+                {showOtpScreen ? "Didn't receive code? " : "Already registered in the cohort?"}
+              </span>
               <br />
-              <Link
-                to="/login"
-                style={{ color: '#16a34a', fontSize: '0.78rem', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '5px', marginTop: '0.2rem', fontWeight: 'bold' }}
-              >
-                Already A Member ? (Login) →
-              </Link>
+              {showOtpScreen ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', alignItems: 'center', marginTop: '0.2rem' }}>
+                  <button
+                    type="button"
+                    onClick={handleResendOtp}
+                    disabled={isSubmitting}
+                    style={{ background: 'none', border: 'none', color: '#16a34a', fontSize: '0.78rem', cursor: isSubmitting ? 'not-allowed' : 'pointer', fontWeight: 'bold', padding: 0 }}
+                  >
+                    Request Again
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setShowOtpScreen(false); setErrorMsg(''); }}
+                    style={{ background: 'none', border: 'none', color: '#64748b', fontSize: '0.74rem', cursor: 'pointer', fontWeight: '500', padding: 0 }}
+                  >
+                    ← Back to Registration
+                  </button>
+                </div>
+              ) : (
+                <Link
+                  to="/login"
+                  style={{ color: '#16a34a', fontSize: '0.78rem', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '5px', marginTop: '0.2rem', fontWeight: 'bold' }}
+                >
+                  Already A Member ? (Login) →
+                </Link>
+              )}
             </div>
           )}
 

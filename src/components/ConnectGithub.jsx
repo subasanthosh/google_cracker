@@ -1,3 +1,5 @@
+import React from 'react';
+import { createPortal } from 'react-dom';
 import { ShieldAlert, ArrowRight, GitBranch } from 'lucide-react';
 
 function ConnectGithub() {
@@ -5,17 +7,17 @@ function ConnectGithub() {
     window.location.href = "http://localhost:8000/login/github";
   };
 
-  return (
+  const overlayContent = (
     <div style={{
       position: 'fixed',
       top: 0,
       left: 0,
-      width: '100vw',
-      height: '100vh',
+      right: 0,
+      bottom: 0,
       backgroundColor: 'rgba(15, 23, 42, 0.85)',
       backdropFilter: 'blur(16px)',
       WebkitBackdropFilter: 'blur(16px)',
-      zIndex: 9999,
+      zIndex: 99999,
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -165,6 +167,9 @@ function ConnectGithub() {
       </div>
     </div>
   );
+
+  return createPortal(overlayContent, document.body);
 }
 
 export default ConnectGithub;
+
