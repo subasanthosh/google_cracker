@@ -529,10 +529,9 @@ export default function CodingSprintSection() {
     <section
       id="coding-sprint"
       style={{
-        padding: isSectionEmpty ? '0' : '7rem 0 6rem',
-        height: isSectionEmpty ? 'calc(100vh - 72px)' : 'auto',
-        minHeight: isSectionEmpty ? 'calc(100vh - 72px)' : 'none',
-        display: isSectionEmpty ? 'flex' : 'block',
+        padding: isSectionEmpty ? '0' : '4rem 0',
+        minHeight: 'calc(100vh - 72px)',
+        display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
         position: 'relative',
@@ -541,16 +540,16 @@ export default function CodingSprintSection() {
       }}
     >
       <style>{STYLES}</style>
-
+ 
       {/* Blurred and darkened background image */}
       <div style={{
         position: 'absolute',
         inset: 0,
         backgroundImage: `url(${bgImage3})`,
-        backgroundSize: '110% 110%',
+        backgroundSize: 'cover',
         backgroundRepeat: 'no-repeat',
         backgroundPosition: 'center',
-        filter: 'blur(8px) brightness(0.6)',
+        filter: 'blur(3px) brightness(0.85)',
         zIndex: 0
       }} />
 

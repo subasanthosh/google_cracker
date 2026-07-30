@@ -60,7 +60,8 @@ async def register(data: dict):
                 "email": data["email"],
                 "github_username": data["github_name"],
                 "password": hashed,
-                "role": "student"
+                "role": "student",
+                "last_login": datetime.now(timezone.utc)
             })
 
         return {"message": "User registered successfully"}
@@ -73,7 +74,24 @@ async def register(data: dict):
 async def login(data: dict):
     try:
         user = await userdb.find_one({"email": data["email"]})
-        print(user)
+        last_login_date = user.get("last_login")
+        if last_login_date is None:
+            await userdb.update_one(
+                {"email": data["email"]},
+                {"$set": {"last_solved_question": 0, "last_login": datetime.now(timezone.utc)}}
+            )
+        else:
+            if last_login_date.date() != datetime.now(timezone.utc).date():
+                last_solved_question = 0
+                await userdb.update_one(
+                    {"email": data["email"]},
+                    {"$set": {"last_solved_question": last_solved_question, "last_login": datetime.now(timezone.utc)}}
+                )
+            else:
+                await userdb.update_one(
+                    {"email": data["email"]},
+                    {"$set": {"last_login": datetime.now(timezone.utc)}}
+                )  
         if user is None:
             raise HTTPException(
                 status_code=404,
@@ -315,10 +333,10 @@ async def check_commit_github(email: str):
             return {
                 "solved" : False
             }
+        user = await userdb.find_one({"github_username" : user_name})
+        last_solved_question = user.get("last_solved_question", 0)
         commit_date = commit_data[0]["commit"]["author"]["date"]    
         if datetime.fromisoformat(commit_date.replace("Z", "+00:00")).date() == datetime.now(timezone.utc).date() and abs(datetime.now(timezone.utc) - datetime.fromisoformat(commit_date.replace("Z", "+00:00"))) <= timedelta(minutes=1.5):
-            user = await userdb.find_one({"github_username" : user_name})
-            last_solved_question = user.get("last_solved_question", 0) 
             await userdb.update_one(
                 {"github_username" : user_name},
                 {

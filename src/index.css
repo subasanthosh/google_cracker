@@ -86,6 +86,7 @@ body {
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    zoom: 0.9;
 }
 
 /* Richer global dark overlay — deep vignette */
@@ -96,7 +97,7 @@ body::before {
     background:
         radial-gradient(ellipse 80% 80% at 50% 0%, rgba(56,189,248,0.05) 0%, transparent 60%),
         radial-gradient(ellipse 60% 60% at 80% 80%, rgba(99,102,241,0.06) 0%, transparent 60%),
-        rgba(2, 4, 8, 0.72);
+        rgba(2, 4, 8, 0.42);
     z-index: -1;
     pointer-events: none;
 }
@@ -275,12 +276,12 @@ p {
     width: 92%;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 6rem 0;
+    padding: 4rem 0;
 }
 
 .grid {
     display: grid;
-    gap: 2.2rem;
+    gap: 1.5rem;
 }
 
 .grid-3 {
@@ -294,7 +295,7 @@ p {
     -webkit-backdrop-filter: blur(24px);
     border: 1px solid rgba(56, 189, 248, 0.10);
     border-radius: var(--radius-lg);
-    padding: 2.5rem;
+    padding: 2rem;
     position: relative;
     overflow: hidden;
     transition: var(--transition-smooth);

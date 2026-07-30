@@ -9,11 +9,11 @@ export default function HeroSection({
 }) {
   return (
     <div className="hero-section" id="hero" style={{
-      backgroundImage: `linear-gradient(rgba(3, 5, 9, 0.45), rgba(3, 5, 9, 0.60)), url(${googleWorkspaceBright})`,
+      backgroundImage: `linear-gradient(rgba(3, 5, 9, 0.20), rgba(3, 5, 9, 0.35)), url(${googleWorkspaceBright})`,
       backgroundSize: 'cover',
       backgroundPosition: 'center',
       backgroundAttachment: 'fixed',
-      minHeight: '100vh',
+      minHeight: '85vh',
       display: 'flex',
       alignItems: 'center',
       paddingTop: '80px',

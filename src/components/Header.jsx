@@ -285,14 +285,14 @@ export default function Header({ xp, level, levelTitle, streak, consoleGlitch, s
             {/* Nav items */}
             <nav className="nav-overlay-links">
               {[
-                { to: '/how-it-works',   label: 'How It Works',              num: '01' },
-                { to: '/weekly-system',  label: 'Weekly System',             num: '02' },
-                { to: '/sprint',         label: 'Daily / Weekly Coding Sprint', num: '03' },
-                { to: '/build-sprint',   label: 'Build Sprint',              num: '04' },
-                { to: '/buddy-system',   label: 'Buddy System',              num: '05' },
-                { to: '/xp-system',      label: 'XP Dashboard',             num: '06' },
-                { to: '/daily-cycle',    label: 'Daily Cycle',               num: '07' },
-                { to: '/faq',            label: 'FAQ',                       num: '08' },
+                { to: '/how-it-works', label: 'How It Works', num: '01' },
+                { to: '/weekly-system', label: 'Weekly System', num: '02' },
+                { to: '/sprint', label: 'Daily / Weekly Coding Sprint', num: '03' },
+                { to: '/build-sprint', label: 'Build Sprint', num: '04' },
+                { to: '/buddy-system', label: 'Buddy System', num: '05' },
+                { to: '/xp-system', label: 'XP Dashboard', num: '06' },
+                { to: '/daily-cycle', label: 'Daily Cycle', num: '07' },
+                { to: '/faq', label: 'FAQ', num: '08' },
               ].map((item, i) => (
                 <NavLink
                   key={item.to}

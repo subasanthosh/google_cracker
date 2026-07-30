@@ -54,7 +54,7 @@ export default function BuddySystemSection({
   const currentBuddy = buddyProfiles[activeBuddyIndex];
 
   return (
-    <section className="buddy-system-section" id="buddy-system" style={{ backgroundImage: `linear-gradient(rgba(3, 5, 9, 0.45), rgba(3, 5, 9, 0.60)), url(${bgImage1})`, backgroundSize: 'cover', backgroundAttachment: 'fixed', padding: '6rem 0' }}>
+    <section className="buddy-system-section" id="buddy-system" style={{ backgroundImage: `linear-gradient(rgba(3, 5, 9, 0.20), rgba(3, 5, 9, 0.35)), url(${bgImage1})`, backgroundSize: 'cover', backgroundAttachment: 'fixed', padding: '4rem 0' }}>
       <div className="container">
         <div className="section-header text-center">
           <h2 className="section-title">The Buddy Synergy Engine</h2>

@@ -19,7 +19,7 @@ export default function ApplySection() {
   };
 
   return (
-    <section className="apply-section" id="apply-now" style={{ backgroundImage: `linear-gradient(rgba(3, 5, 9, 0.5), rgba(3, 5, 9, 0.75)), url(${bgImage0})`, backgroundSize: 'cover', backgroundAttachment: 'fixed', padding: '6rem 0' }}>
+    <section className="apply-section" id="apply-now" style={{ backgroundImage: `linear-gradient(rgba(3, 5, 9, 0.20), rgba(3, 5, 9, 0.40)), url(${bgImage0})`, backgroundSize: 'cover', backgroundAttachment: 'fixed', padding: '4rem 0' }}>
       <div className="container text-center max-w-md">
 
         {/* Back Button */}

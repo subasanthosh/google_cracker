@@ -162,7 +162,7 @@ export default function Login({ earnXP }) {
       justifyContent: 'center',
       padding: '0.75rem',
       boxSizing: 'border-box',
-      backgroundColor: '#ffffff',
+      backgroundColor: 'transparent',
     }}>
       {/* Google Fonts import for Raleway */}
       <style>{`
@@ -188,12 +188,15 @@ export default function Login({ earnXP }) {
 
       {/* Background with increased brightness, no blur, no white overlay */}
       <div style={{
-        position: 'absolute',
-        inset: 0,
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
         backgroundImage: "url(./google_bright_exterior.png)",
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        filter: 'brightness(1.5) blur(1.5px)',
+        filter: 'brightness(1.5) blur(0.5px)',
         zIndex: 0,
       }} />
 

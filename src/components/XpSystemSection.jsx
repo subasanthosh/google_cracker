@@ -26,7 +26,7 @@ export default function XpSystemSection({ xp, level, levelTitle, badges, leaderb
   };
 
   return (
-    <section className="xp-system-section" id="xp-system" style={{ backgroundImage: `linear-gradient(rgba(3, 5, 9, 0.45), rgba(3, 5, 9, 0.60)), url(${bgImage5})`, backgroundSize: 'cover', backgroundAttachment: 'fixed', padding: '6rem 0' }}>
+    <section className="xp-system-section" id="xp-system" style={{ backgroundImage: `linear-gradient(rgba(3, 5, 9, 0.20), rgba(3, 5, 9, 0.35)), url(${bgImage5})`, backgroundSize: 'cover', backgroundAttachment: 'fixed', padding: '4rem 0' }}>
       <div className="container">
         <div className="section-header text-center">
           <h2 className="section-title">Velocity XP Dashboard</h2>
