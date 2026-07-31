@@ -1,3 +1,4 @@
+from requests import head
 from starlette.types import Receive
 import secrets
 from requests import request
@@ -142,7 +143,7 @@ async def register(data: dict):
                 "role": "student",
                 "last_login": datetime.now(timezone.utc),
                 "otp" : hashed_otp,
-                "otp_last_created" : datetime.now(timezone.utc)
+                "otp_last_created" : datetime.now(timezone.utc),
             })
 
         return {"message": "User registered successfully"}
@@ -599,3 +600,75 @@ async def get_last_solved_ques(email: str):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/latest/file/changes")
+async def latest_file_changes(data :dict):
+    try:
+        user = await userdb.find_one(
+            {
+                "email" : data["email"],
+
+            }
+        )
+        user_name = user.get("github_username")
+        token = user.get("github_token")
+        url1 = f"https://api.github.com/users/{user_name}/repos/"
+        response1 = requests.get(
+            url1,
+            headers = {
+                "Accept" : "application/vnd.github+json",
+                "Authorization" : f"token {token}"
+            },
+            params = {
+                "sort" : "pushed",
+                "direction" : "desc",
+                "per_page" : 1
+            }
+        )
+        repo_data  = response1.json()
+        for i in repo_data:
+            if i.get("name","").lower() != "google_cracker" and i.get("name","").lower() != "leetcode":
+                top_repo = i.get("name","")
+                break
+
+        url2 = f"https://api.github.com/repos/{user_name}/{top_repo}/commits"
+        response2 = requests.get(
+            url2,
+            headers = {
+                "Accept" : "application/vnd.github+json",
+                "Authorization" : f"token {token}"
+            },
+            params = {
+                "per_page" : 1
+            }
+        )
+        commit_data = response2.json()
+        sha = commit_data[0]["sha"]
+        url3 = f"https://api.github.com/repos/{user_name}/{top_repo}/commits/{sha}"
+        response3 = requests.get(
+            url3,
+            headers = {
+                "Accept" : "application/vnd.github+json",
+                "Authorization" : f"token {token}"
+            }
+        )
+        commit_history = response3.json()
+        if not commit_history:
+            return {
+                "project_done" : False
+            }
+        total = commit_history["stats"]["total"]
+        if total >= 50:
+            return {
+                "project_done" : True
+            }
+        else:
+            return {
+                "project_done" : False
+            }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+        
