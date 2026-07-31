@@ -16,8 +16,12 @@ import FaqSection from './components/FaqSection';
 import WeeklySystemSection from './components/WeeklySystemSection';
 import Login from './components/Login';
 import Register from './components/Register';
+import ProjectTrackerSection from './components/ProjectTrackerSection';
 
 import { initialLeaderboard } from './constants';
+import googleWorkspaceBright from './assets/google_workspace_bright.png';
+import googleAbstractTech from './assets/google_abstract_tech.png';
+import googleCafeteriaBright from './assets/google_cafeteria_bright.png';
 
 export default function App() {
   const [xp, setXp] = useState(350);
@@ -64,6 +68,66 @@ export default function App() {
       }
     }
   }, []);
+
+  useEffect(() => {
+    const fetchXpFromDb = async () => {
+      const email = localStorage.getItem("email") || "";
+      if (!email) return;
+      try {
+        const res = await fetch(`http://localhost:8000/get/xp_scores?email=${encodeURIComponent(email)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.xp_scores !== undefined) {
+            setXp(data.xp_scores);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch XP from DB:", err);
+      }
+    };
+    
+    fetchXpFromDb();
+    const interval = setInterval(fetchXpFromDb, 4000);
+    return () => clearInterval(interval);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    const htmlEl = document.documentElement;
+    switch (location.pathname) {
+      case '/sprint':
+        htmlEl.style.setProperty('--page-bg', `url(${googleWorkspaceBright})`);
+        htmlEl.style.setProperty('--page-bg-filter', 'blur(3px) brightness(0.85)');
+        break;
+      case '/project-tracker':
+        htmlEl.style.setProperty('--page-bg', `url(${googleAbstractTech})`);
+        htmlEl.style.setProperty('--page-bg-filter', 'brightness(0.7)');
+        break;
+      case '/build-sprint':
+        htmlEl.style.setProperty('--page-bg', `url(${googleCafeteriaBright})`);
+        htmlEl.style.setProperty('--page-bg-filter', 'brightness(0.8)');
+        break;
+      case '/buddy-system':
+        htmlEl.style.setProperty('--page-bg', `url(${googleWorkspaceBright})`);
+        htmlEl.style.setProperty('--page-bg-filter', 'brightness(0.8)');
+        break;
+      case '/xp-system':
+        htmlEl.style.setProperty('--page-bg', `url(${googleWorkspaceBright})`);
+        htmlEl.style.setProperty('--page-bg-filter', 'brightness(0.8)');
+        break;
+      case '/daily-cycle':
+        htmlEl.style.setProperty('--page-bg', `url(${googleCafeteriaBright})`);
+        htmlEl.style.setProperty('--page-bg-filter', 'brightness(0.8)');
+        break;
+      case '/weekly-system':
+        htmlEl.style.setProperty('--page-bg', `url(${googleCafeteriaBright})`);
+        htmlEl.style.setProperty('--page-bg-filter', 'brightness(0.8)');
+        break;
+      default:
+        htmlEl.style.removeProperty('--page-bg');
+        htmlEl.style.removeProperty('--page-bg-filter');
+        break;
+    }
+  }, [location.pathname]);
 
   useEffect(() => {
     const stateToSave = { xp, streak, level, levelTitle, badges, scheduledSessions };
@@ -172,6 +236,16 @@ export default function App() {
     ]);
 
     appendTerminalOutput(`PoW validation log: ${reason}. +${amount} XP granted.`);
+
+    // Sync XP to database
+    const email = localStorage.getItem("email") || "";
+    if (email) {
+      fetch("http://localhost:8000/update/xp_scores", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, xp_scores: amount })
+      }).catch(err => console.error("Error updating XP in DB:", err));
+    }
   };
 
   const handleTerminalSubmit = (e) => {
@@ -264,6 +338,7 @@ export default function App() {
           <Route path="/apply-now" element={<ApplySection />} />
           <Route path="/faq" element={<FaqSection />} />
           <Route path="/weekly-system" element={<WeeklySystemSection />} />
+          <Route path="/project-tracker" element={<ProjectTrackerSection />} />
           <Route path="/login" element={<Login earnXP={earnXP} />} />
           <Route path="/register" element={<Register earnXP={earnXP} />} />
           <Route path="*" element={

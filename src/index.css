@@ -72,21 +72,33 @@ body.console-glitch-mode {
 html {
     scroll-behavior: smooth;
     background-color: var(--bg-base);
+    min-height: 100vh;
+}
+
+html::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: var(--page-bg, url('/google_campus_bg.png'));
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    filter: var(--page-bg-filter, none);
+    z-index: -10;
+    pointer-events: none;
 }
 
 body {
     font-family: var(--font-sans);
     color: var(--text-primary);
-    background-color: var(--bg-base);
-    background-image: url('/google_campus_bg.png');
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
+    background-color: transparent;
     line-height: 1.65;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     zoom: 0.9;
+    min-height: 100vh;
 }
 
 /* Richer global dark overlay — deep vignette */
@@ -108,8 +120,22 @@ body::before {
     margin: 0;
     text-align: left;
     border-inline: none;
-    min-height: auto;
-    display: block;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.dark-theme {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .mono-font {
@@ -273,8 +299,8 @@ p {
 }
 
 .container {
-    width: 92%;
-    max-width: 1200px;
+    width: 94%;
+    max-width: 1500px;
     margin: 0 auto;
     padding: 4rem 0;
 }

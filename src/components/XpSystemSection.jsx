@@ -26,14 +26,27 @@ export default function XpSystemSection({ xp, level, levelTitle, badges, leaderb
   };
 
   return (
-    <section className="xp-system-section" id="xp-system" style={{ backgroundImage: `linear-gradient(rgba(3, 5, 9, 0.20), rgba(3, 5, 9, 0.35)), url(${bgImage5})`, backgroundSize: 'cover', backgroundAttachment: 'fixed', padding: '4rem 0' }}>
+    <section 
+      className="xp-system-section" 
+      id="xp-system" 
+      style={{ 
+        backgroundImage: `linear-gradient(rgba(3, 5, 9, 0.20), rgba(3, 5, 9, 0.35)), url(${bgImage5})`, 
+        backgroundSize: 'cover', 
+        backgroundAttachment: 'fixed', 
+        padding: '4rem 0',
+        minHeight: 'calc(100vh - 72px)',
+        display: 'flex',
+        flexDirection: 'column',
+        flex: 1
+      }}
+    >
       <div className="container">
         <div className="section-header text-center">
           <h2 className="section-title">Velocity XP Dashboard</h2>
           <p className="section-subtitle text-muted">Complete tasks, gain XP, unlock badges, and rise up the cohort leaderboard.</p>
         </div>
 
-        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+        <div style={{ maxWidth: '1350px', margin: '0 auto' }}>
           {/* Leaderboard Table */}
           <div className="leaderboard-panel glass-card">
             <div className="leaderboard-header">

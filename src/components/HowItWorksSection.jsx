@@ -56,7 +56,7 @@ export default function HowItWorksSection() {
           }
         `}</style>
 
-        <div className="tech-font" style={{ maxWidth: '1100px', width: '92%', margin: '0 auto', position: 'relative', zIndex: 2, textAlign: 'center' }}>
+        <div className="tech-font" style={{ maxWidth: '1500px', width: '92%', margin: '0 auto', position: 'relative', zIndex: 2, textAlign: 'center' }}>
           {/* Quote Header */}
           <span style={{ display: 'block', fontSize: '1rem', fontWeight: '800', letterSpacing: '0.08em', color: '#FBBC05', textTransform: 'uppercase', marginBottom: '0.35rem' }}>
             💬 Quote of the Journey
@@ -95,7 +95,7 @@ export default function HowItWorksSection() {
           <blockquote style={{ 
             borderLeft: '4px solid #FBBC05', 
             margin: '0.6rem auto', 
-            maxWidth: '900px',
+            maxWidth: '1200px',
             width: '85%',
             fontSize: '1.15rem', 
             fontStyle: 'italic', 
@@ -177,7 +177,7 @@ export default function HowItWorksSection() {
           borderBottom: '1px solid rgba(0, 240, 255, 0.1)'
         }}
       >
-        <div className="container" style={{ maxWidth: '700px', margin: '0 auto', padding: 0 }}>
+        <div className="container" style={{ maxWidth: '1100px', margin: '0 auto', padding: 0 }}>
           <h2 style={{ fontSize: '1.6rem', marginBottom: '1.2rem', color: '#FBBC05' }}>💬 Quote of the Journey</h2>
           <blockquote style={{ fontSize: '1.7rem', lineHeight: '1.4', fontStyle: 'italic', fontWeight: 600, color: '#fff' }}>
             "Success at Google is not built in one day. It is built by showing up every single day for 13 months."
@@ -291,7 +291,7 @@ export default function HowItWorksSection() {
           </div>
           
           {/* XP Table */}
-          <div className="glass-card" style={{ maxWidth: '700px', margin: '0 auto', padding: '2rem' }}>
+          <div className="glass-card" style={{ maxWidth: '900px', margin: '0 auto', padding: '2rem' }}>
             <h3 style={{ textAlign: 'center', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', color: '#fff', fontSize: '1.25rem' }}>
               <Zap size={20} color="#FBBC05" /> XP System
             </h3>

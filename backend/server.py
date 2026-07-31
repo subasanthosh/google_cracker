@@ -144,6 +144,7 @@ async def register(data: dict):
                 "last_login": datetime.now(timezone.utc),
                 "otp" : hashed_otp,
                 "otp_last_created" : datetime.now(timezone.utc),
+                "xp_scores" : 0,
             })
 
         return {"message": "User registered successfully"}
@@ -328,10 +329,15 @@ async def login(data: dict):
                 detail="User Not Found"
             )
         else:
-            print(user["password"])
             try:
                 ph = PasswordHasher()
                 ph.verify(user["password"], data["password"])
+                points = user.get("xp_scores")
+                total = points + 10
+                await userdb.update_one(
+                    {"email": data["email"]},
+                    {"$set": {"xp_scores": total}}
+                )
                 return {"message": "Login successful"}
             except VerifyMismatchError:
                 raise HTTPException(
@@ -367,6 +373,7 @@ async def add_daily_ques(data: dict):
     try:
         title = data["title"].strip()
         link = data["link"].strip()
+        difficulty = data.get("difficulty", "medium").strip()
         await dailyques_db.update_one(
             {
                 "date": datetime.now().strftime("%Y-%m-%d")
@@ -375,7 +382,8 @@ async def add_daily_ques(data: dict):
                 "$push": {
                     "questions": {
                         "title": title,
-                        "link": link
+                        "link": link,
+                        "difficulty": difficulty
                     }
                 }
             },
@@ -387,11 +395,29 @@ async def add_daily_ques(data: dict):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.delete("/dailyques")
+async def delete_daily_ques(data: dict):
+    try:
+        title = data["title"].strip()
+        today = datetime.now().strftime("%Y-%m-%d")
+        result = await dailyques_db.update_one(
+            {"date": today},
+            {"$pull": {"questions": {"title": title}}}
+        )
+        if result.modified_count == 0:
+            raise HTTPException(status_code=404, detail="Question not found for today")
+        return {"message": "Daily question deleted successfully"}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.post("/weeklyques")
 async def add_weekly_ques(data: dict):
     try:
         title = data["title"].strip()
         link = data["link"].strip()
+        difficulty = data.get("difficulty", "medium").strip()
         await weeklyques_db.update_one(
             {
                 "date": datetime.now().strftime("%Y-%m-%d")
@@ -400,13 +426,31 @@ async def add_weekly_ques(data: dict):
                 "$push": {
                     "questions": {
                         "title": title,
-                        "link": link
+                        "link": link,
+                        "difficulty": difficulty
                     }
                 }
             },
             upsert=True
         )
         return {"message": "Weekly question added successfully", "data": data}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.delete("/weeklyques")
+async def delete_weekly_ques(data: dict):
+    try:
+        title = data["title"].strip()
+        today = datetime.now().strftime("%Y-%m-%d")
+        result = await weeklyques_db.update_one(
+            {"date": today},
+            {"$pull": {"questions": {"title": title}}}
+        )
+        if result.modified_count == 0:
+            raise HTTPException(status_code=404, detail="Question not found for this week")
+        return {"message": "Weekly question deleted successfully"}
     except HTTPException:
         raise
     except Exception as e:
@@ -603,17 +647,19 @@ async def get_last_solved_ques(email: str):
 
 
 @app.get("/latest/file/changes")
-async def latest_file_changes(data :dict):
+async def latest_file_changes(email: str):
     try:
-        user = await userdb.find_one(
-            {
-                "email" : data["email"],
-
-            }
-        )
+        user = await userdb.find_one({"email": email})
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+            
         user_name = user.get("github_username")
         token = user.get("github_token")
-        url1 = f"https://api.github.com/users/{user_name}/repos/"
+        
+        if not user_name or not token:
+            raise HTTPException(status_code=400, detail="GitHub profile not connected. Please connect GitHub first.")
+
+        url1 = f"https://api.github.com/users/{user_name}/repos"
         response1 = requests.get(
             url1,
             headers = {
@@ -623,14 +669,29 @@ async def latest_file_changes(data :dict):
             params = {
                 "sort" : "pushed",
                 "direction" : "desc",
-                "per_page" : 1
+                "per_page" : 10
             }
         )
-        repo_data  = response1.json()
+        
+        if response1.status_code != 200:
+            raise HTTPException(status_code=response1.status_code, detail=f"GitHub API returned error: {response1.text}")
+            
+        repo_data = response1.json()
+        if not isinstance(repo_data, list):
+            raise HTTPException(status_code=500, detail="Invalid repos response format from GitHub API")
+
+        top_repo = None
         for i in repo_data:
-            if i.get("name","").lower() != "google_cracker" and i.get("name","").lower() != "leetcode":
-                top_repo = i.get("name","")
+            repo_name = i.get("name","")
+            if repo_name.lower() != "google_cracker" and repo_name.lower() != "leetcode":
+                top_repo = repo_name
                 break
+        print(top_repo)
+        if not top_repo:
+            return {
+                "project_done" : False,
+                "message": "No active repositories found (excluding google_cracker and leetcode)"
+            }
 
         url2 = f"https://api.github.com/repos/{user_name}/{top_repo}/commits"
         response2 = requests.get(
@@ -643,8 +704,24 @@ async def latest_file_changes(data :dict):
                 "per_page" : 1
             }
         )
+        
+        if response2.status_code != 200:
+            raise HTTPException(status_code=response2.status_code, detail=f"GitHub API returned error for commits: {response2.text}")
+            
         commit_data = response2.json()
-        sha = commit_data[0]["sha"]
+        if not commit_data or not isinstance(commit_data, list):
+            return {
+                "project_done" : False,
+                "message": "No commits found in the repository"
+            }
+            
+        sha = commit_data[0].get("sha")
+        if not sha:
+            return {
+                "project_done": False,
+                "message": "Latest commit SHA not found"
+            }
+
         url3 = f"https://api.github.com/repos/{user_name}/{top_repo}/commits/{sha}"
         response3 = requests.get(
             url3,
@@ -653,22 +730,78 @@ async def latest_file_changes(data :dict):
                 "Authorization" : f"token {token}"
             }
         )
+        
+        if response3.status_code != 200:
+            raise HTTPException(status_code=response3.status_code, detail=f"GitHub API returned error for commit details: {response3.text}")
+            
         commit_history = response3.json()
-        if not commit_history:
+        if not commit_history or "stats" not in commit_history:
             return {
-                "project_done" : False
+                "project_done" : False,
+                "message": "No change stats found in the latest commit"
             }
-        total = commit_history["stats"]["total"]
+            
+        total = commit_history["stats"].get("total", 0)
         if total >= 50:
             return {
-                "project_done" : True
+                "project_done" : True,
+                "total_changes": total
             }
         else:
             return {
-                "project_done" : False
+                "project_done" : False,
+                "total_changes": total,
+                "message": f"Only {total} changes detected. Minimum requirement is 50."
             }
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-        
+
+@app.post("/update/xp_scores")
+async def update_xp_scores(data : dict):
+    try:
+        user = await userdb.find_one({
+            "email": data["email"]
+        })
+        if not user:
+            raise HTTPException(
+                status_code=404,
+                detail="User Not Found"
+            )
+        else:
+            points = data["xp_scores"]
+            user_points = user.get("xp_scores", 0)
+            total = points + user_points
+            await userdb.update_one(
+                {
+                    "email" : data["email"]
+                },
+                {
+                    "$set" : {
+                        "xp_scores" : total
+                    }
+                }
+                               
+            )
+            return {
+                "current_points" : total
+            }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/get/xp_scores")
+async def get_xp_scores(email: str):
+    try:
+        user = await userdb.find_one({"email": email})
+        if not user:
+            raise HTTPException(status_code=404, detail="User Not Found")
+        return {
+            "xp_scores": user.get("xp_scores", 0)
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

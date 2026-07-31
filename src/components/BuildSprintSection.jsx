@@ -27,7 +27,20 @@ export default function BuildSprintSection() {
   }, []);
 
   return (
-    <section className="build-sprint-section" id="build-sprint" style={{ backgroundImage: `linear-gradient(rgba(3, 5, 9, 0.20), rgba(3, 5, 9, 0.35)), url(${bgImage4})`, backgroundSize: 'cover', backgroundAttachment: 'fixed', padding: '4rem 0' }}>
+    <section 
+      className="build-sprint-section" 
+      id="build-sprint" 
+      style={{ 
+        backgroundImage: `linear-gradient(rgba(3, 5, 9, 0.20), rgba(3, 5, 9, 0.35)), url(${bgImage4})`, 
+        backgroundSize: 'cover', 
+        backgroundAttachment: 'fixed', 
+        padding: '4rem 0',
+        minHeight: 'calc(100vh - 72px)',
+        display: 'flex',
+        flexDirection: 'column',
+        flex: 1
+      }}
+    >
       <div className="container">
         <div className="section-header text-center">
           <h2 className="section-title">Build Sprint: Show Your Shipping Power</h2>

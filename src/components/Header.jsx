@@ -232,7 +232,11 @@ export default function Header({ xp, level, levelTitle, streak, consoleGlitch, s
                     </Link>
                     <Link
                       to="/login"
-                      onClick={() => setProfileOpen(false)}
+                      onClick={() => {
+                        setProfileOpen(false);
+                        localStorage.removeItem("email");
+                        localStorage.removeItem("velocity_cohort_state");
+                      }}
                       style={{ fontSize: '0.82rem', color: 'rgba(255,100,100,0.8)', textDecoration: 'none', fontFamily: 'var(--font-mono)' }}
                     >
                       Logout
@@ -293,6 +297,7 @@ export default function Header({ xp, level, levelTitle, streak, consoleGlitch, s
                 { to: '/xp-system', label: 'XP Dashboard', num: '06' },
                 { to: '/daily-cycle', label: 'Daily Cycle', num: '07' },
                 { to: '/faq', label: 'FAQ', num: '08' },
+                { to: '/project-tracker', label: 'Project Tracker', num: '09' },
               ].map((item, i) => (
                 <NavLink
                   key={item.to}
@@ -313,7 +318,11 @@ export default function Header({ xp, level, levelTitle, streak, consoleGlitch, s
               <Link
                 to="/login"
                 className="btn btn-primary nav-overlay-cta"
-                onClick={() => setMobileMenuOpen(false)}
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  localStorage.removeItem("email");
+                  localStorage.removeItem("velocity_cohort_state");
+                }}
               >
                 Logout
               </Link>

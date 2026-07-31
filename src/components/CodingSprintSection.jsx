@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Code2, Trophy, Plus, X, Loader2, ExternalLink, Zap, Target, Lock, CheckCircle, AlertCircle } from 'lucide-react';
+import { Code2, Trophy, Plus, X, Loader2, ExternalLink, Zap, Target, Lock, CheckCircle, AlertCircle, Star, Trash2 } from 'lucide-react';
 import bgImage3 from '../assets/google_workspace_bright.png';
 
 const STYLES = `
@@ -256,6 +256,66 @@ const STYLES = `
     box-shadow: 0 0 0 3px rgba(251,188,5,0.1);
   }
 
+  .sprint-difficulty-select {
+    padding: 0.8rem 1.1rem;
+    border-radius: 10px;
+    border: 1.5px solid rgba(255,255,255,0.12);
+    background: rgba(10, 16, 35, 0.7);
+    color: #f1f5f9;
+    font-size: 0.95rem;
+    font-family: 'Inter', sans-serif;
+    outline: none;
+    width: 100%;
+    box-sizing: border-box;
+    cursor: pointer;
+    transition: border-color 0.25s, box-shadow 0.25s;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
+  }
+  .sprint-difficulty-select:focus {
+    border-color: rgba(66,133,244,0.6);
+    box-shadow: 0 0 0 3px rgba(66,133,244,0.12);
+  }
+  .sprint-difficulty-select option {
+    background: #0a1020;
+    color: #f1f5f9;
+  }
+  .sprint-difficulty-select.weekly-select:focus {
+    border-color: rgba(251,188,5,0.55);
+    box-shadow: 0 0 0 3px rgba(251,188,5,0.1);
+  }
+
+  .difficulty-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.18rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.04em;
+    flex-shrink: 0;
+  }
+  .difficulty-badge.easy {
+    background: rgba(34, 197, 94, 0.12);
+    border: 1px solid rgba(34, 197, 94, 0.35);
+    color: #4ade80;
+  }
+  .difficulty-badge.medium {
+    background: rgba(251, 188, 5, 0.12);
+    border: 1px solid rgba(251, 188, 5, 0.35);
+    color: #ffd055;
+  }
+  .difficulty-badge.hard {
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    color: #f87171;
+  }
+
   .sprint-modal-cancel {
     flex: 1;
     padding: 0.8rem 1rem;
@@ -302,6 +362,30 @@ const STYLES = `
     box-shadow: 0 6px 22px rgba(251,188,5,0.45);
   }
 
+  .sprint-delete-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.4rem 0.75rem;
+    border-radius: 30px;
+    border: 1.5px solid rgba(239,68,68,0.4);
+    background: rgba(239,68,68,0.08);
+    color: #f87171;
+    font-size: 0.78rem;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    white-space: nowrap;
+  }
+  .sprint-delete-btn:hover {
+    background: rgba(239,68,68,0.18);
+    border-color: rgba(239,68,68,0.75);
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(239,68,68,0.2);
+  }
+
   .sprint-empty-state {
     display: flex;
     flex-direction: column;
@@ -338,23 +422,30 @@ export default function CodingSprintSection() {
   const [isDailyModalOpen, setIsDailyModalOpen] = useState(false);
   const [questionTitle, setQuestionTitle] = useState("");
   const [questionLink, setQuestionLink] = useState("");
+  const [questionDifficulty, setQuestionDifficulty] = useState("medium");
   const [questions, setQuestions] = useState([]);
 
   // Weekly Assessment State
   const [isWeeklyModalOpen, setIsWeeklyModalOpen] = useState(false);
   const [assessmentTitle, setAssessmentTitle] = useState("");
   const [assessmentLink, setAssessmentLink] = useState("");
+  const [assessmentDifficulty, setAssessmentDifficulty] = useState("medium");
   const [assessments, setAssessments] = useState([]);
   const [role, setRole] = useState("");
+  const [roleLoaded, setRoleLoaded] = useState(false);
 
-  const isAdmin = role?.toLowerCase() === 'admin';
+  const isAdmin = role?.trim().toLowerCase() === 'admin';
 
   const [unlockedIndex, setUnlockedIndex] = useState(0);
   const [verifyingIdx, setVerifyingIdx] = useState(null);
   const [verifyError, setVerifyError] = useState("");
   const [verifySuccess, setVerifySuccess] = useState("");
+  const [dbXp, setDbXp] = useState(null);
+  const [xpUpdating, setXpUpdating] = useState(false);
 
-  const handleVerifyCommit = async (idx) => {
+  const XP_BY_DIFFICULTY = { easy: 15, medium: 35, hard: 60 };
+
+  const handleVerifyCommit = async (idx, question) => {
     const email = localStorage.getItem("email") || "";
     if (!email) {
       setVerifyError("User email not found. Please log in again.");
@@ -375,7 +466,10 @@ export default function CodingSprintSection() {
       if (data.solved === true) {
         const nextIndex = data.last_solved_question !== undefined ? data.last_solved_question : (idx + 1);
         setUnlockedIndex(nextIndex);
-        setVerifySuccess(`Question ${idx + 1} verified successfully! Next question unlocked.`);
+        const difficulty = question?.difficulty || "medium";
+        const xpEarned = XP_BY_DIFFICULTY[difficulty] ?? 35;
+        setVerifySuccess(`Question ${idx + 1} verified! +${xpEarned} XP awarded. Next question unlocked.`);
+        await pushXpToDb(email, xpEarned);
       } else {
         setVerifyError("Verification failed: Solution not found. Please make sure you push your commits to your GitHub repository.");
       }
@@ -384,6 +478,25 @@ export default function CodingSprintSection() {
       setVerifyError(`Failed to verify commit: ${err.message}`);
     } finally {
       setVerifyingIdx(null);
+    }
+  };
+
+  const pushXpToDb = async (email, points) => {
+    setXpUpdating(true);
+    try {
+      const res = await fetch("http://localhost:8000/update/xp_scores", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, xp_scores: points })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setDbXp(data.current_points);
+      }
+    } catch (err) {
+      console.error("XP update error:", err);
+    } finally {
+      setXpUpdating(false);
     }
   };
 
@@ -396,9 +509,12 @@ export default function CodingSprintSection() {
           { method: "GET" }
         );
         const data = await res.json();
+        console.log("[Role fetched]:", data.role);
         setRole(data.role);
       } catch (err) {
         console.error(err);
+      } finally {
+        setRoleLoaded(true);
       }
     };
 
@@ -458,6 +574,22 @@ export default function CodingSprintSection() {
     fetchRole();
     fetchAllQuestions();
     fetchLastSolved();
+
+    // Fetch live XP from DB
+    const fetchXp = async () => {
+      try {
+        const email = localStorage.getItem("email") || "";
+        if (!email) return;
+        const res = await fetch(`http://localhost:8000/get/xp_scores?email=${encodeURIComponent(email)}`);
+        if (res.ok) {
+          const data = await res.json();
+          setDbXp(data.xp_scores);
+        }
+      } catch (err) {
+        console.error("XP fetch error:", err);
+      }
+    };
+    fetchXp();
   }, []);
 
   const handleAddQuestion = async (e) => {
@@ -466,7 +598,8 @@ export default function CodingSprintSection() {
 
     const payload = {
       title: questionTitle.trim(),
-      link: questionLink.trim()
+      link: questionLink.trim(),
+      difficulty: questionDifficulty
     };
 
     try {
@@ -480,6 +613,7 @@ export default function CodingSprintSection() {
       setQuestions((prev) => [...prev, { id: Date.now(), ...payload }]);
       setQuestionTitle("");
       setQuestionLink("");
+      setQuestionDifficulty("medium");
       setIsDailyModalOpen(false);
     } catch (err) {
       console.error("Error adding daily question:", err);
@@ -492,7 +626,8 @@ export default function CodingSprintSection() {
 
     const payload = {
       title: assessmentTitle.trim(),
-      link: assessmentLink.trim()
+      link: assessmentLink.trim(),
+      difficulty: assessmentDifficulty
     };
 
     try {
@@ -506,9 +641,44 @@ export default function CodingSprintSection() {
       setAssessments((prev) => [...prev, { id: Date.now(), ...payload }]);
       setAssessmentTitle("");
       setAssessmentLink("");
+      setAssessmentDifficulty("medium");
       setIsWeeklyModalOpen(false);
     } catch (err) {
       console.error("Error adding weekly assessment:", err);
+    }
+  };
+
+  const handleDeleteQuestion = async (title) => {
+    try {
+      const res = await fetch("http://localhost:8000/dailyques", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title })
+      });
+      if (res.ok) {
+        setQuestions((prev) => prev.filter((q) => q.title !== title));
+      } else {
+        console.error("Failed to delete daily question");
+      }
+    } catch (err) {
+      console.error("Error deleting daily question:", err);
+    }
+  };
+
+  const handleDeleteAssessment = async (title) => {
+    try {
+      const res = await fetch("http://localhost:8000/weeklyques", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title })
+      });
+      if (res.ok) {
+        setAssessments((prev) => prev.filter((a) => a.title !== title));
+      } else {
+        console.error("Failed to delete weekly assessment");
+      }
+    } catch (err) {
+      console.error("Error deleting weekly assessment:", err);
     }
   };
 
@@ -536,22 +706,13 @@ export default function CodingSprintSection() {
         justifyContent: 'center',
         position: 'relative',
         overflow: 'hidden',
-        boxSizing: 'border-box'
+        boxSizing: 'border-box',
+        flex: 1
       }}
     >
       <style>{STYLES}</style>
  
-      {/* Blurred and darkened background image */}
-      <div style={{
-        position: 'absolute',
-        inset: 0,
-        backgroundImage: `url(${bgImage3})`,
-        backgroundSize: 'cover',
-        backgroundRepeat: 'no-repeat',
-        backgroundPosition: 'center',
-        filter: 'blur(3px) brightness(0.85)',
-        zIndex: 0
-      }} />
+
 
       {/* Decorative glow orbs */}
       <div style={{
@@ -567,7 +728,7 @@ export default function CodingSprintSection() {
         borderRadius: '50%', pointerEvents: 'none', filter: 'blur(60px)'
       }} />
 
-      <div style={{ maxWidth: '1100px', width: '100%', boxSizing: 'border-box', margin: '0 auto', padding: '0 2rem', position: 'relative', zIndex: 1 }}>
+      <div style={{ maxWidth: '1500px', width: '100%', boxSizing: 'border-box', margin: '0 auto', padding: '0 2rem', position: 'relative', zIndex: 1 }}>
 
         {/* Section Header */}
         <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
@@ -606,6 +767,49 @@ export default function CodingSprintSection() {
           }}>
             Sharpen your logic, write high-performance solutions, and climb the scoreboard.
           </p>
+
+          {/* XP Score Widget */}
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.6rem',
+            marginTop: '1.25rem',
+            padding: '0.55rem 1.35rem',
+            borderRadius: '50px',
+            background: 'rgba(251,188,5,0.1)',
+            border: '1.5px solid rgba(251,188,5,0.35)',
+            backdropFilter: 'blur(10px)',
+            boxShadow: '0 4px 20px rgba(251,188,5,0.12)'
+          }}>
+            <Star size={15} color="#ffd055" fill="#ffd055" />
+            <span style={{
+              fontFamily: 'Inter, sans-serif',
+              fontWeight: '700',
+              fontSize: '0.88rem',
+              color: 'rgba(255,255,255,0.65)',
+              letterSpacing: '0.06em',
+              textTransform: 'uppercase'
+            }}>Your XP</span>
+            <span style={{
+              fontFamily: 'Inter, sans-serif',
+              fontWeight: '800',
+              fontSize: '1rem',
+              color: '#ffd055',
+              minWidth: '60px',
+              textAlign: 'center',
+              transition: 'all 0.4s ease'
+            }}>
+              {dbXp === null ? (
+                <Loader2 size={14} style={{ animation: 'spin 1s linear infinite', display: 'inline-block' }} />
+              ) : (
+                xpUpdating ? (
+                  <span style={{ opacity: 0.6 }}>{dbXp} ✦</span>
+                ) : (
+                  `${dbXp} XP`
+                )
+              )}
+            </span>
+          </div>
         </div>
 
         {/* Tabs Header */}
@@ -740,10 +944,14 @@ export default function CodingSprintSection() {
                         <div
                           className={`sprint-question-card${isLocked ? ' locked' : ''}`}
                           key={q.id || q._id || idx}
-                          style={isLocked ? {
+                          style={isLocked && !isAdmin ? {
                             opacity: 0.45,
                             pointerEvents: 'none',
                             userSelect: 'none',
+                            borderColor: 'rgba(255,255,255,0.03)',
+                            background: 'rgba(10, 16, 32, 0.4)'
+                          } : isLocked && isAdmin ? {
+                            opacity: 0.7,
                             borderColor: 'rgba(255,255,255,0.03)',
                             background: 'rgba(10, 16, 32, 0.4)'
                           } : {}}
@@ -773,82 +981,100 @@ export default function CodingSprintSection() {
                             }}>
                               {idx + 1}
                             </span>
-                            <span style={{
-                              color: isLocked ? '#64748b' : '#ffffff',
-                              fontWeight: '700',
-                              fontSize: '0.97rem',
-                              fontFamily: 'Inter, sans-serif',
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              whiteSpace: 'nowrap'
-                            }}>
-                              {q.title}
-                            </span>
-                          </div>
-                          {isLocked ? (
-                            <span style={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '0.35rem',
-                              padding: '0.45rem 1rem',
-                              borderRadius: '30px',
-                              background: 'rgba(255, 255, 255, 0.03)',
-                              border: '1px solid rgba(255, 255, 255, 0.08)',
-                              color: 'rgba(255, 255, 255, 0.4)',
-                              fontSize: '0.82rem',
-                              fontWeight: '600',
-                              fontFamily: 'Inter, sans-serif'
-                            }}>
-                              <Lock size={13} />
-                              Locked
-                            </span>
-                          ) : isSolved ? (
-                            <span style={{
-                              display: 'inline-flex',
-                              alignItems: 'center',
-                              gap: '0.35rem',
-                              padding: '0.45rem 1rem',
-                              borderRadius: '30px',
-                              background: 'rgba(34, 197, 94, 0.12)',
-                              border: '1.5px solid rgba(34, 197, 94, 0.4)',
-                              color: '#4ade80',
-                              fontSize: '0.82rem',
-                              fontWeight: '700',
-                              fontFamily: 'Inter, sans-serif'
-                            }}>
-                              <CheckCircle size={13} />
-                              Verified
-                            </span>
-                          ) : (
-                            <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                              <a
-                                href={q.link}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="sprint-solve-btn"
-                              >
-                                <ExternalLink size={13} />
-                                Solve
-                              </a>
-                              <button
-                                onClick={() => handleVerifyCommit(idx)}
-                                disabled={verifyingIdx !== null}
-                                className="sprint-verify-btn"
-                              >
-                                {verifyingIdx === idx ? (
-                                  <>
-                                    <Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} />
-                                    Verifying...
-                                  </>
-                                ) : (
-                                  <>
-                                    <Zap size={13} />
-                                    Verify Push
-                                  </>
-                                )}
-                              </button>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', overflow: 'hidden', flex: 1 }}>
+                              <span style={{
+                                color: isLocked ? '#64748b' : '#ffffff',
+                                fontWeight: '700',
+                                fontSize: '0.97rem',
+                                fontFamily: 'Inter, sans-serif',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSpace: 'nowrap'
+                              }}>
+                                {q.title}
+                              </span>
+                              {q.difficulty && (
+                                <span className={`difficulty-badge ${q.difficulty}`}>
+                                  {q.difficulty.charAt(0).toUpperCase() + q.difficulty.slice(1)}
+                                </span>
+                              )}
                             </div>
-                          )}
+                          </div>
+                          <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexShrink: 0 }}>
+                            {isLocked ? (
+                              <span style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.35rem',
+                                padding: '0.45rem 1rem',
+                                borderRadius: '30px',
+                                background: 'rgba(255, 255, 255, 0.03)',
+                                border: '1px solid rgba(255, 255, 255, 0.08)',
+                                color: 'rgba(255, 255, 255, 0.4)',
+                                fontSize: '0.82rem',
+                                fontWeight: '600',
+                                fontFamily: 'Inter, sans-serif'
+                              }}>
+                                <Lock size={13} />
+                                Locked
+                              </span>
+                            ) : isSolved ? (
+                              <span style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.35rem',
+                                padding: '0.45rem 1rem',
+                                borderRadius: '30px',
+                                background: 'rgba(34, 197, 94, 0.12)',
+                                border: '1.5px solid rgba(34, 197, 94, 0.4)',
+                                color: '#4ade80',
+                                fontSize: '0.82rem',
+                                fontWeight: '700',
+                                fontFamily: 'Inter, sans-serif'
+                              }}>
+                                <CheckCircle size={13} />
+                                Verified
+                              </span>
+                            ) : (
+                              <>
+                                <a
+                                  href={q.link}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="sprint-solve-btn"
+                                >
+                                  <ExternalLink size={13} />
+                                  Solve
+                                </a>
+                                <button
+                                  onClick={() => handleVerifyCommit(idx, q)}
+                                  disabled={verifyingIdx !== null}
+                                  className="sprint-verify-btn"
+                                >
+                                  {verifyingIdx === idx ? (
+                                    <>
+                                      <Loader2 size={13} style={{ animation: 'spin 1s linear infinite' }} />
+                                      Verifying...
+                                    </>
+                                  ) : (
+                                    <>
+                                      <Zap size={13} />
+                                      Verify Push
+                                    </>
+                                  )}
+                                </button>
+                              </>
+                            )}
+                            {isAdmin && (
+                              <button
+                                onClick={() => handleDeleteQuestion(q.title)}
+                                className="sprint-delete-btn"
+                                title="Delete question"
+                              >
+                                <Trash2 size={13} />
+                              </button>
+                            )}
+                          </div>
                         </div>
                       );
                     })}
@@ -942,27 +1168,45 @@ export default function CodingSprintSection() {
                           }}>
                             {idx + 1}
                           </span>
-                          <span style={{
-                            color: '#ffffff',
-                            fontWeight: '700',
-                            fontSize: '0.97rem',
-                            fontFamily: 'Inter, sans-serif',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                            whiteSpace: 'nowrap'
-                          }}>
-                            {a.title}
-                          </span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.55rem', overflow: 'hidden', flex: 1 }}>
+                            <span style={{
+                              color: '#ffffff',
+                              fontWeight: '700',
+                              fontSize: '0.97rem',
+                              fontFamily: 'Inter, sans-serif',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap'
+                            }}>
+                              {a.title}
+                            </span>
+                            {a.difficulty && (
+                              <span className={`difficulty-badge ${a.difficulty}`}>
+                                {a.difficulty.charAt(0).toUpperCase() + a.difficulty.slice(1)}
+                              </span>
+                            )}
+                          </div>
                         </div>
-                        <a
-                          href={a.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="sprint-assess-btn"
-                        >
-                          <ExternalLink size={13} />
-                          Start
-                        </a>
+                        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', flexShrink: 0 }}>
+                          <a
+                            href={a.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="sprint-assess-btn"
+                          >
+                            <ExternalLink size={13} />
+                            Start
+                          </a>
+                          {isAdmin && (
+                            <button
+                              onClick={() => handleDeleteAssessment(a.title)}
+                              className="sprint-delete-btn"
+                              title="Delete assessment"
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          )}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -1054,6 +1298,22 @@ export default function CodingSprintSection() {
                   required
                   className="sprint-modal-input"
                 />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+                <label htmlFor="question-difficulty" style={{ color: 'rgba(255,255,255,0.75)', fontWeight: '600', fontSize: '0.85rem', fontFamily: 'Inter, sans-serif' }}>
+                  Difficulty
+                </label>
+                <select
+                  id="question-difficulty"
+                  value={questionDifficulty}
+                  onChange={(e) => setQuestionDifficulty(e.target.value)}
+                  className="sprint-difficulty-select"
+                >
+                  <option value="easy">🟢 Easy</option>
+                  <option value="medium">🟡 Medium</option>
+                  <option value="hard">🔴 Hard</option>
+                </select>
               </div>
 
               <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.25rem' }}>
@@ -1149,6 +1409,22 @@ export default function CodingSprintSection() {
                   required
                   className="sprint-modal-input weekly-input"
                 />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+                <label htmlFor="assessment-difficulty" style={{ color: 'rgba(255,255,255,0.75)', fontWeight: '600', fontSize: '0.85rem', fontFamily: 'Inter, sans-serif' }}>
+                  Difficulty
+                </label>
+                <select
+                  id="assessment-difficulty"
+                  value={assessmentDifficulty}
+                  onChange={(e) => setAssessmentDifficulty(e.target.value)}
+                  className="sprint-difficulty-select weekly-select"
+                >
+                  <option value="easy">🟢 Easy</option>
+                  <option value="medium">🟡 Medium</option>
+                  <option value="hard">🔴 Hard</option>
+                </select>
               </div>
 
               <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.25rem' }}>
