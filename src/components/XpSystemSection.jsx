@@ -1,26 +1,20 @@
 import React, { useState } from 'react';
-import { Zap, Award, Code, Trophy } from 'lucide-react';
+import { Zap, Award, Code, Trophy, Loader2 } from 'lucide-react';
 import bgImage5 from '../assets/google_workspace_bright.png';
 
 
-export default function XpSystemSection({ xp, level, levelTitle, badges, leaderboardData, earnXP }) {
+export default function XpSystemSection({ xp, badges, leaderboardData, earnXP }) {
   const [lbFilter, setLbFilter] = useState("all");
   const [lbSearch, setLbSearch] = useState("");
 
   const getFilteredLeaderboard = () => {
     let devs = [...leaderboardData];
-    
-    if (lbFilter === "weekly") {
-      devs.sort((a, b) => b.weekly - a.weekly);
-    } else if (lbFilter === "streaks") {
-      devs.sort((a, b) => b.streak - a.streak);
-    } else {
-      devs.sort((a, b) => b.xp - a.xp);
-    }
-
     if (lbSearch.trim() !== "") {
       const q = lbSearch.toLowerCase();
-      devs = devs.filter(d => d.name.toLowerCase().includes(q) || d.handle.toLowerCase().includes(q));
+      devs = devs.filter(d => 
+        (d.name && d.name.toLowerCase().includes(q)) || 
+        (d.email && d.email.toLowerCase().includes(q))
+      );
     }
     return devs;
   };
@@ -59,17 +53,8 @@ export default function XpSystemSection({ xp, level, levelTitle, badges, leaderb
                   placeholder="Search developer..."
                   value={lbSearch}
                   onChange={(e) => setLbSearch(e.target.value)}
+                  style={{ width: '100%' }}
                 />
-                <select
-                  id="leaderboard-filter"
-                  className="leaderboard-filter-select"
-                  value={lbFilter}
-                  onChange={(e) => setLbFilter(e.target.value)}
-                >
-                  <option value="all">Overall Rank</option>
-                  <option value="weekly">Weekly Speed</option>
-                  <option value="streaks">Top Streaks</option>
-                </select>
               </div>
             </div>
             <div className="table-container">
@@ -78,33 +63,64 @@ export default function XpSystemSection({ xp, level, levelTitle, badges, leaderb
                   <tr>
                     <th>Rank</th>
                     <th>Developer</th>
-                    <th>Streak</th>
-                    <th>Level</th>
+                    <th>Email</th>
                     <th className="text-right">Total XP</th>
                   </tr>
                 </thead>
                 <tbody id="leaderboard-tbody">
-                  {getFilteredLeaderboard().map((dev, idx) => (
-                    <tr key={idx} className={dev.handle === '@console_lord' ? 'active-user-row' : ''}>
-                      <td className="table-rank">#{idx + 1}</td>
-                      <td>
-                        <div className="table-developer-cell">
-                          <img src={dev.avatar} alt={dev.name} className="dev-avatar" />
-                          <div>
-                            <span className="dev-name">{dev.name}</span>
-                            <span className="dev-handle-sub">{dev.handle}</span>
-                          </div>
-                        </div>
+                  {leaderboardData.length === 0 ? (
+                    <tr>
+                      <td colSpan={4} style={{ padding: '3rem 1rem', textAlign: 'center' }}>
+                        <Loader2 className="animate-spin" size={24} style={{ display: 'inline-block', color: '#00f0ff' }} />
+                        <p style={{ color: 'rgba(148,163,184,0.7)', fontStyle: 'italic', marginTop: '0.5rem', fontSize: '0.9rem', fontFamily: 'Inter, sans-serif' }}>
+                          Loading cohort rankings...
+                        </p>
                       </td>
-                      <td>
-                        <span className="table-streak"><Zap className="xp-icon" size={12} fill="currentColor" /> {dev.streak}d</span>
-                      </td>
-                      <td>
-                        <span className="table-level font-mono">LVL {dev.level}</span>
-                      </td>
-                      <td className="table-xp text-right font-mono">{dev.xp.toLocaleString()}</td>
                     </tr>
-                  ))}
+                  ) : (
+                    getFilteredLeaderboard().map((dev, idx) => {
+                      const loggedInEmail = localStorage.getItem("email") || "";
+                      const isActive = dev.email === loggedInEmail;
+                      return (
+                        <tr key={idx} className={isActive ? 'active-user-row' : ''}>
+                          <td className="table-rank">#{idx + 1}</td>
+                          <td>
+                            <div className="table-developer-cell">
+                              <div style={{
+                                width: '32px',
+                                height: '32px',
+                                borderRadius: '50%',
+                                background: 'linear-gradient(135deg, #00f0ff 0%, #39ff14 100%)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                fontWeight: 'bold',
+                                color: '#030813',
+                                fontSize: '0.85rem',
+                                fontFamily: 'var(--font-mono)',
+                                flexShrink: 0
+                              }}>
+                                {dev.name ? dev.name.charAt(0).toUpperCase() : '?'}
+                              </div>
+                              <div>
+                                <span className="dev-name">{dev.name || 'Anonymous'}</span>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <span className="table-email font-mono" style={{ color: 'rgba(255,255,255,0.75)' }}>{dev.email}</span>
+                          </td>
+                          <td className="table-xp text-right font-mono">
+                            {dev.xp === null ? (
+                              <Loader2 className="animate-spin" size={12} style={{ display: 'inline-block' }} />
+                            ) : (
+                              dev.xp.toLocaleString()
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
                 </tbody>
               </table>
             </div>

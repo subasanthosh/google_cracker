@@ -414,7 +414,7 @@ const STYLES = `
   }
 `;
 
-export default function CodingSprintSection() {
+export default function CodingSprintSection({ xp, earnXP }) {
   const [activeTab, setActiveTab] = useState("daily");
   const [loading, setLoading] = useState(true);
 
@@ -440,8 +440,6 @@ export default function CodingSprintSection() {
   const [verifyingIdx, setVerifyingIdx] = useState(null);
   const [verifyError, setVerifyError] = useState("");
   const [verifySuccess, setVerifySuccess] = useState("");
-  const [dbXp, setDbXp] = useState(null);
-  const [xpUpdating, setXpUpdating] = useState(false);
 
   const XP_BY_DIFFICULTY = { easy: 15, medium: 35, hard: 60 };
 
@@ -469,7 +467,9 @@ export default function CodingSprintSection() {
         const difficulty = question?.difficulty || "medium";
         const xpEarned = XP_BY_DIFFICULTY[difficulty] ?? 35;
         setVerifySuccess(`Question ${idx + 1} verified! +${xpEarned} XP awarded. Next question unlocked.`);
-        await pushXpToDb(email, xpEarned);
+        if (earnXP) {
+          earnXP(xpEarned, `Daily Question ${idx + 1} verified`);
+        }
       } else {
         setVerifyError("Verification failed: Solution not found. Please make sure you push your commits to your GitHub repository.");
       }
@@ -478,25 +478,6 @@ export default function CodingSprintSection() {
       setVerifyError(`Failed to verify commit: ${err.message}`);
     } finally {
       setVerifyingIdx(null);
-    }
-  };
-
-  const pushXpToDb = async (email, points) => {
-    setXpUpdating(true);
-    try {
-      const res = await fetch("http://localhost:8000/update/xp_scores", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, xp_scores: points })
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setDbXp(data.current_points);
-      }
-    } catch (err) {
-      console.error("XP update error:", err);
-    } finally {
-      setXpUpdating(false);
     }
   };
 
@@ -574,22 +555,6 @@ export default function CodingSprintSection() {
     fetchRole();
     fetchAllQuestions();
     fetchLastSolved();
-
-    // Fetch live XP from DB
-    const fetchXp = async () => {
-      try {
-        const email = localStorage.getItem("email") || "";
-        if (!email) return;
-        const res = await fetch(`http://localhost:8000/get/xp_scores?email=${encodeURIComponent(email)}`);
-        if (res.ok) {
-          const data = await res.json();
-          setDbXp(data.xp_scores);
-        }
-      } catch (err) {
-        console.error("XP fetch error:", err);
-      }
-    };
-    fetchXp();
   }, []);
 
   const handleAddQuestion = async (e) => {
@@ -799,14 +764,10 @@ export default function CodingSprintSection() {
               textAlign: 'center',
               transition: 'all 0.4s ease'
             }}>
-              {dbXp === null ? (
+              {xp === null ? (
                 <Loader2 size={14} style={{ animation: 'spin 1s linear infinite', display: 'inline-block' }} />
               ) : (
-                xpUpdating ? (
-                  <span style={{ opacity: 0.6 }}>{dbXp} ✦</span>
-                ) : (
-                  `${dbXp} XP`
-                )
+                `${xp} XP`
               )}
             </span>
           </div>

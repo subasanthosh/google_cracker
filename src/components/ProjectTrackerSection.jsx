@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Terminal, GitBranch, AlertTriangle, CheckCircle2, Loader2, ArrowRight, RefreshCw, Mail, ShieldAlert } from 'lucide-react';
 import bgImage from '../assets/google_abstract_tech.png';
 
-export default function ProjectTrackerSection() {
+export default function ProjectTrackerSection({ earnXP }) {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
@@ -80,6 +80,9 @@ export default function ProjectTrackerSection() {
         await addLog('✅ Verification successful! Dev Velocity target of 50+ line changes met.', 300);
         setResult('success');
         setStatusMsg('Project Verified successfully! You have met the developer threshold.');
+        if (earnXP) {
+          earnXP(100, 'Project Milestone Compliance Met');
+        }
       } else {
         await addLog('❌ Verification completed, but constraints were NOT satisfied.', 300);
         setResult('failure');

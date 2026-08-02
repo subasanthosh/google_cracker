@@ -120,6 +120,9 @@ export default function Login({ earnXP }) {
       }
       else {
         localStorage.setItem("email", handle);
+        if (data.first_login) {
+          localStorage.setItem("login_checkin_bonus", "true");
+        }
       }
 
       /* ── Success flow ── */
@@ -127,7 +130,7 @@ export default function Login({ earnXP }) {
         `Initializing authentication handshake...`,
         `Verifying candidate handle: ${handle}...`,
         `Decrypting access key security layer...`,
-        `Handshake success. Welcome to Velocity Kernel.`,
+        `Handshake success. Welcome to Welcome Kernel.`,
       ];
 
       logs.forEach((log, index) => {
@@ -135,7 +138,6 @@ export default function Login({ earnXP }) {
           setTerminalLogs(prev => [...prev, log]);
           if (index === logs.length - 1) {
             setTimeout(() => {
-              earnXP(20, 'Console Access Authenticated');
               checkGithubAccess(handle);
             }, 800);
           }

@@ -145,6 +145,7 @@ async def register(data: dict):
                 "otp" : hashed_otp,
                 "otp_last_created" : datetime.now(timezone.utc),
                 "xp_scores" : 0,
+                "joined_date" : datetime.now(timezone.utc)  
             })
 
         return {"message": "User registered successfully"}
@@ -301,53 +302,73 @@ async def request_otp_again(data: dict):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+        
 @app.post("/logininpage")
 async def login(data: dict):
     try:
         user = await userdb.find_one({"email": data["email"]})
-        last_login_date = user.get("last_login")
-        if last_login_date is None:
-            await userdb.update_one(
-                {"email": data["email"]},
-                {"$set": {"last_solved_question": 0, "last_login": datetime.now(timezone.utc)}}
-            )
-        else:
-            if last_login_date.date() != datetime.now(timezone.utc).date():
-                last_solved_question = 0
-                await userdb.update_one(
-                    {"email": data["email"]},
-                    {"$set": {"last_solved_question": last_solved_question, "last_login": datetime.now(timezone.utc)}}
-                )
-            else:
-                await userdb.update_one(
-                    {"email": data["email"]},
-                    {"$set": {"last_login": datetime.now(timezone.utc)}}
-                )  
+
         if user is None:
             raise HTTPException(
                 status_code=404,
                 detail="User Not Found"
             )
-        else:
-            try:
-                ph = PasswordHasher()
-                ph.verify(user["password"], data["password"])
-                points = user.get("xp_scores")
-                total = points + 10
-                await userdb.update_one(
-                    {"email": data["email"]},
-                    {"$set": {"xp_scores": total}}
-                )
-                return {"message": "Login successful"}
-            except VerifyMismatchError:
-                raise HTTPException(
-                    status_code=401,
-                    detail="Invalid password"
-                )
+
+        try:
+            ph = PasswordHasher()
+            ph.verify(user["password"], data["password"])
+
+            now = datetime.now(timezone.utc)
+
+            last_login = user.get("last_login")
+            if last_login and last_login.tzinfo is None:
+                last_login = last_login.replace(tzinfo=timezone.utc)
+
+            points = user.get("xp_scores") or 0
+            total = points
+            first_login = False
+            last_solved_question = user.get("last_solved_question", 0)
+
+            if last_login is None:
+                total += 10
+                first_login = True
+                last_solved_question = 0
+            elif last_login.date() != now.date():
+                total += 10
+                first_login = True
+                last_solved_question = 0
+
+            await userdb.update_one(
+                {"email": data["email"]},
+                {
+                    "$set": {
+                        "xp_scores": total,
+                        "last_login": now,
+                        "last_solved_question": last_solved_question
+                    }
+                }
+            )
+
+            return {
+                "message": "Login successful",
+                "points": total,
+                "first_login": first_login
+            }
+
+        except VerifyMismatchError:
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid password"
+            )
+
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(
+            status_code=500,
+            detail=f"AUTH_ERR [500]: {str(e)}"
+        )
 
 @app.get("/getrole")
 async def get_role(email: str):
@@ -736,7 +757,7 @@ async def latest_file_changes(email: str):
             
         commit_history = response3.json()
         if not commit_history or "stats" not in commit_history:
-            return {
+            return {                                                                
                 "project_done" : False,
                 "message": "No change stats found in the latest commit"
             }
@@ -771,7 +792,9 @@ async def update_xp_scores(data : dict):
             )
         else:
             points = data["xp_scores"]
-            user_points = user.get("xp_scores", 0)
+            user_points = user.get("xp_scores")
+            if user_points is None:
+                user_points = 0
             total = points + user_points
             await userdb.update_one(
                 {
@@ -798,8 +821,53 @@ async def get_xp_scores(email: str):
         user = await userdb.find_one({"email": email})
         if not user:
             raise HTTPException(status_code=404, detail="User Not Found")
+        xp_scores = user.get("xp_scores")
+        if xp_scores is None:
+            xp_scores = 0
         return {
-            "xp_scores": user.get("xp_scores", 0)
+            "xp_scores": xp_scores
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/get/usersforrank")
+async def get_users_for_rank():
+    try:
+        users = await userdb.find({}).to_list(length=100)
+        res = []
+        for user in users:
+            xp = user.get("xp_scores")
+            if xp is None:
+                xp = 0
+            temp = {
+                "name": user.get("name"),
+                "xp": xp,
+                "email": user.get("email")
+            }
+            res.append(temp)
+        res.sort(key=lambda x: x["xp"], reverse=True)
+        return res
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+       
+        
+            
+@app.get("/userprofile")
+async def user_profile(email : str):
+    try:
+        user = await userdb.find_one({"email": email})
+        if not user:
+            raise HTTPException(status_code=404, detail="User Not Found")
+        return {
+            "name": user.get("name"),
+            "xp": user.get("xp_scores"),
+            "email": user.get("email"),
+            "github_username": user.get("github_username"),
+            "joined_date": user.get("joined_date"),
         }
     except HTTPException:
         raise

@@ -1,22 +1,51 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
-import { Zap, Terminal, Menu, Monitor, X, User, Star, GitBranch, Mail, Shield, ChevronRight } from 'lucide-react';
+import { Zap, Terminal, Menu, Monitor, X, User, Star, GitBranch, Mail, Shield, ChevronRight, Loader2 } from 'lucide-react';
 
-/* ── Mock user profile — replace with real auth data as needed ── */
-const USER_PROFILE = {
-  name: 'Console Lord',
-  email: 'console_lord@gmail.com',
-  github: 'https://github.com/console_lord',
-  joinDate: 'Jan 2026',
-  targetCompany: 'Google',
-};
 
-export default function Header({ xp, level, levelTitle, streak, consoleGlitch, setConsoleGlitch }) {
+
+export default function Header({ xp, streak, consoleGlitch, setConsoleGlitch }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef(null);
   const location = useLocation();
   const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
+
+  const [profileData, setProfileData] = useState(null);
+  const [profileLoading, setProfileLoading] = useState(false);
+
+  useEffect(() => {
+    if (!profileOpen) return;
+    
+    const fetchProfile = async () => {
+      const email = localStorage.getItem("email") || "";
+      if (!email) return;
+      setProfileLoading(true);
+      try {
+        const res = await fetch(`http://localhost:8000/userprofile?email=${encodeURIComponent(email)}`);
+        if (res.ok) {
+          const data = await res.json();
+          setProfileData(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch user profile:", err);
+      } finally {
+        setProfileLoading(false);
+      }
+    };
+    
+    fetchProfile();
+  }, [profileOpen, xp]);
+
+  const formatJoinedDate = (dateStr) => {
+    if (!dateStr) return "Jan 2026";
+    try {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+    } catch (e) {
+      return "Jan 2026";
+    }
+  };
 
   /* Close overlay on outside click */
   useEffect(() => {
@@ -29,9 +58,11 @@ export default function Header({ xp, level, levelTitle, streak, consoleGlitch, s
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
-  const initials = USER_PROFILE.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-  const xpToNext = 1000 - (xp % 1000);
-  const pct = Math.min(((xp % 1000) / 1000) * 100, 100).toFixed(1);
+  const displayName = profileData?.name || (localStorage.getItem("email") || "Console Lord");
+  const initials = displayName.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+  const xpVal = xp ?? 0;
+  const xpToNext = 1000 - (xpVal % 1000);
+  const pct = Math.min(((xpVal % 1000) / 1000) * 100, 100).toFixed(1);
 
   return (
     <>
@@ -47,7 +78,13 @@ export default function Header({ xp, level, levelTitle, streak, consoleGlitch, s
             {/* XP Badge */}
             <div className="user-xp-status" id="header-xp-badge">
               <Zap className="xp-icon" size={16} fill="currentColor" />
-              <span className="xp-value" id="current-xp-header">{xp}</span>
+              <span className="xp-value" id="current-xp-header" style={{ display: 'inline-flex', alignItems: 'center' }}>
+                {xp === null ? (
+                  <Loader2 className="animate-spin" size={14} style={{ display: 'inline-block' }} />
+                ) : (
+                  xp
+                )}
+              </span>
               <span className="xp-label">XP</span>
             </div>
 
@@ -55,7 +92,7 @@ export default function Header({ xp, level, levelTitle, streak, consoleGlitch, s
             <div ref={profileRef} style={{ position: 'relative' }}>
               <button
                 onClick={() => setProfileOpen(prev => !prev)}
-                title="Developer Level Profile"
+                title="Developer Profile"
                 style={{
                   width: '38px',
                   height: '38px',
@@ -124,10 +161,7 @@ export default function Header({ xp, level, levelTitle, streak, consoleGlitch, s
                     </div>
                     <div>
                       <div style={{ color: '#fff', fontWeight: '700', fontSize: '1rem', marginBottom: '2px' }}>
-                        {USER_PROFILE.name}
-                      </div>
-                      <div style={{ color: 'rgba(0,240,255,0.75)', fontSize: '0.75rem', fontFamily: 'var(--font-mono)' }}>
-                        LVL {level ?? 1} — {levelTitle ?? 'COMPILING_INIT'}
+                        {profileLoading ? "Loading..." : displayName}
                       </div>
                     </div>
                   </div>
@@ -138,62 +172,54 @@ export default function Header({ xp, level, levelTitle, streak, consoleGlitch, s
                     {/* Email */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       <Mail size={14} style={{ color: '#00f0ff', flexShrink: 0 }} />
-                      <span style={{ fontSize: '0.85rem', color: 'rgba(220,240,255,0.85)', wordBreak: 'break-all' }}>{USER_PROFILE.email}</span>
+                      <span style={{ fontSize: '0.85rem', color: 'rgba(220,240,255,0.85)', wordBreak: 'break-all' }}>
+                        {profileLoading ? "Loading..." : (profileData?.email || localStorage.getItem("email"))}
+                      </span>
                     </div>
 
                     {/* GitHub */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       <GitBranch size={14} style={{ color: '#39ff14', flexShrink: 0 }} />
-                      <a href={USER_PROFILE.github} target="_blank" rel="noreferrer"
-                        style={{ fontSize: '0.85rem', color: 'rgba(57,255,20,0.85)', textDecoration: 'none' }}>
-                        {USER_PROFILE.github.replace('https://', '')}
-                      </a>
+                      {profileLoading ? (
+                        <span style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.5)' }}>Loading...</span>
+                      ) : (
+                        profileData?.github_username ? (
+                          <a href={`https://github.com/${profileData.github_username}`} target="_blank" rel="noreferrer"
+                            style={{ fontSize: '0.85rem', color: 'rgba(57,255,20,0.85)', textDecoration: 'none' }}>
+                            github.com/{profileData.github_username}
+                          </a>
+                        ) : (
+                          <span style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.5)' }}>No GitHub connected</span>
+                        )
+                      )}
                     </div>
 
                     {/* Target company */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       <Shield size={14} style={{ color: '#f59e0b', flexShrink: 0 }} />
-                      <span style={{ fontSize: '0.85rem', color: 'rgba(245,158,11,0.85)' }}>Target: {USER_PROFILE.targetCompany}</span>
+                      <span style={{ fontSize: '0.85rem', color: 'rgba(245,158,11,0.85)' }}>Target: Google</span>
                     </div>
 
                     {/* Joined */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       <Star size={14} style={{ color: '#8b5cf6', flexShrink: 0 }} />
-                      <span style={{ fontSize: '0.85rem', color: 'rgba(200,180,255,0.80)' }}>Joined: {USER_PROFILE.joinDate}</span>
-                    </div>
-
-                    {/* Divider */}
-                    <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', margin: '0.25rem 0' }} />
-
-                    {/* XP Progress bar */}
-                    <div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                        <span style={{ fontSize: '0.75rem', color: 'rgba(0,240,255,0.7)', fontFamily: 'var(--font-mono)' }}>
-                          XP PROGRESS
-                        </span>
-                        <span style={{ fontSize: '0.75rem', color: '#fff', fontFamily: 'var(--font-mono)' }}>
-                          {xp} / {Math.ceil(xp / 1000) * 1000}
-                        </span>
-                      </div>
-                      <div style={{ height: '6px', background: 'rgba(255,255,255,0.08)', borderRadius: '99px', overflow: 'hidden' }}>
-                        <div style={{
-                          height: '100%',
-                          width: `${pct}%`,
-                          background: 'linear-gradient(90deg, #00f0ff, #39ff14)',
-                          borderRadius: '99px',
-                          transition: 'width 0.5s ease',
-                        }} />
-                      </div>
-                      <div style={{ fontSize: '0.72rem', color: 'rgba(160,200,220,0.55)', marginTop: '4px', fontFamily: 'var(--font-mono)' }}>
-                        {xpToNext} XP to next level
-                      </div>
+                      <span style={{ fontSize: '0.85rem', color: 'rgba(200,180,255,0.80)' }}>
+                        Joined: {profileLoading ? "Loading..." : formatJoinedDate(profileData?.joined_date)}
+                      </span>
                     </div>
 
                     {/* Stats row */}
                     <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.25rem' }}>
                       {[
-                        { label: 'Total XP', value: xp, color: '#00f0ff' },
-                        { label: 'Level', value: level ?? 1, color: '#39ff14' },
+                        { 
+                          label: 'Total XP', 
+                          value: xp === null ? (
+                            <Loader2 className="animate-spin" size={15} style={{ display: 'inline-block' }} />
+                          ) : (
+                            xp
+                          ), 
+                          color: '#00f0ff' 
+                        },
                         { label: 'Streak', value: `${streak ?? 0}d`, color: '#f59e0b' },
                       ].map(stat => (
                         <div key={stat.label} style={{
@@ -293,11 +319,9 @@ export default function Header({ xp, level, levelTitle, streak, consoleGlitch, s
                 { to: '/weekly-system', label: 'Weekly System', num: '02' },
                 { to: '/sprint', label: 'Daily / Weekly Coding Sprint', num: '03' },
                 { to: '/build-sprint', label: 'Build Sprint', num: '04' },
-                { to: '/buddy-system', label: 'Buddy System', num: '05' },
-                { to: '/xp-system', label: 'XP Dashboard', num: '06' },
-                { to: '/daily-cycle', label: 'Daily Cycle', num: '07' },
-                { to: '/faq', label: 'FAQ', num: '08' },
-                { to: '/project-tracker', label: 'Project Tracker', num: '09' },
+                { to: '/xp-system', label: 'XP Dashboard', num: '05' },
+                { to: '/faq', label: 'FAQ', num: '06' },
+                { to: '/project-tracker', label: 'Project Tracker', num: '07' },
               ].map((item, i) => (
                 <NavLink
                   key={item.to}

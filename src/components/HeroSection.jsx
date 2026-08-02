@@ -1,10 +1,10 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Activity } from 'lucide-react';
+import { Activity, Loader2 } from 'lucide-react';
 import googleWorkspaceBright from '../assets/google_workspace_bright.png';
 
 export default function HeroSection({
-  streak, xp, level, levelTitle, feedItems,
+  streak, xp, feedItems,
   terminalInValue, setTerminalInValue, terminalOutLines, handleTerminalSubmit, terminalInputRef
 }) {
   return (
@@ -68,7 +68,13 @@ export default function HeroSection({
                   <span className="stat-lbl">Consistency</span>
                 </div>
                 <div className="stat-box">
-                  <span className="stat-val text-neon-green" id="hero-xp-total">{xp}</span>
+                  <span className="stat-val text-neon-green" id="hero-xp-total" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                    {xp === null ? (
+                      <Loader2 className="animate-spin" size={20} style={{ display: 'inline-block' }} />
+                    ) : (
+                      xp
+                    )}
+                  </span>
                   <span className="stat-lbl">XP Earned</span>
                 </div>
               </div>
